@@ -1,0 +1,323 @@
+{
+  "common": {
+    "ok": "OK",
+    "cancel": "Cancel",
+    "success": "Success",
+    "error": "Error",
+    "close": "Close",
+    "save": "Save",
+    "language": "Language",
+    "settings": "Settings",
+    "loading": "Loading...",
+    "yes": "Yes",
+    "no": "No"
+  },
+  "languages": {
+    "english": "English",
+    "danish": "Danish",
+    "arabic": "Arabic"
+  },
+  "welcome": {
+    "title": "GTO Poker Assistant",
+    "subtitle": "Master Poker with AI-Powered Analysis",
+    "features": {
+      "liveAnalysis": {
+        "title": "Live Analysis",
+        "description": "Real-time GTO decisions in under 3 seconds"
+      },
+      "trainingMode": {
+        "title": "Training Mode",
+        "description": "Practice with interactive scenarios"
+      },
+      "performanceTracking": {
+        "title": "Performance Tracking",
+        "description": "Detailed analytics and progress reports"
+      }
+    },
+    "buttons": {
+      "getStarted": "Get Started",
+      "alreadyHaveAccount": "I Already Have an Account"
+    },
+    "footer": "Join thousands of players improving their game"
+  },
+  "auth": {
+    "login": {
+      "title": "Welcome Back",
+      "subtitle": "Sign in to continue your poker journey",
+      "emailLabel": "Email Address",
+      "emailPlaceholder": "Enter your email",
+      "passwordLabel": "Password",
+      "passwordPlaceholder": "Enter your password",
+      "forgotPassword": "Forgot Password?",
+      "signIn": "Sign In",
+      "signingIn": "Signing In...",
+      "orContinueWith": "or continue with",
+      "google": "Google",
+      "apple": "Apple",
+      "dontHaveAccount": "Don't have an account?",
+      "signUp": "Sign Up"
+    },
+    "register": {
+      "title": "Create Account",
+      "subtitle": "Join thousands of players improving their game",
+      "fullNameLabel": "Full Name",
+      "fullNamePlaceholder": "Enter your full name",
+      "emailLabel": "Email Address",
+      "emailPlaceholder": "Enter your email",
+      "passwordLabel": "Password",
+      "passwordPlaceholder": "Create a password",
+      "confirmPasswordLabel": "Confirm Password",
+      "confirmPasswordPlaceholder": "Confirm your password",
+      "passwordHint": "At least 6 characters",
+      "agreeToTerms": "I agree to the",
+      "termsOfService": "Terms of Service",
+      "and": "and",
+      "privacyPolicy": "Privacy Policy",
+      "createAccount": "Create Account",
+      "creatingAccount": "Creating Account...",
+      "alreadyHaveAccount": "Already have an account?",
+      "signIn": "Sign In",
+      "chooseAvatar": "Choose Avatar",
+      "uploadYourPhoto": "Upload Your Photo",
+      "gallery": "Gallery",
+      "camera": "Camera"
+    },
+    "errors": {
+      "fillAllFields": "Please fill in all fields",
+      "enterFullName": "Please enter your full name",
+      "enterEmail": "Please enter your email address",
+      "validEmail": "Please enter a valid email address",
+      "passwordLength": "Password must be at least 6 characters long",
+      "passwordsMatch": "Passwords do not match",
+      "agreeToTerms": "Please agree to the Terms of Service and Privacy Policy",
+      "registrationFailed": "Registration failed. Please try again.",
+      "emailExists": "An account with this email already exists",
+      "networkError": "Network connection failed. Please check your internet connection and try again.",
+      "timeoutError": "Request timed out. Please check your connection and try again.",
+      "loginFailed": "Login failed. Please check your credentials.",
+      "invalidCredentials": "Invalid email or password"
+    },
+    "success": {
+      "loginSuccessful": "Login successful!",
+      "accountCreated": "Account created successfully!"
+    }
+  },
+  "dashboard": {
+    "greeting": "Welcome back",
+    "subtitle": "Ready to improve your game?",
+    "dailyGoal": "Daily Goal",
+    "handsPlayed": "Hands Played",
+    "accuracy": "Accuracy",
+    "studyTime": "Study Time",
+    "gameMode": {
+      "title": "Game Mode",
+      "cash": {
+        "title": "Cash Games",
+        "subtitle": "Deep stack strategy • 100bb+",
+        "description": "Master deep stack play with optimal ranges and sizing"
+      },
+      "tournaments": {
+        "title": "Spin & Go",
+        "subtitle": "Short stack • Fast-paced", 
+        "description": "Perfect push/fold decisions and hyper-turbo strategy"
+      }
+    },
+    "quickActions": {
+      "title": "Quick Actions",
+      "startSession": "Start Session",
+      "reviewHands": "Review Hands",
+      "practiceSpots": "Practice Spots",
+      "analyzeHand": "Analyze Hand",
+      "practice": "Practice scenarios",
+      "analyze": "Analysis tools",
+      "scenarios": "Training spots",
+      "liveAnalysis": "Live GTO analysis"
+    },
+    "recentSessions": {
+      "title": "Recent Sessions",
+      "noSessions": "No recent sessions",
+      "viewAll": "View All",
+      "gameType": "Game Type",
+      "position": "Position",
+      "accuracy": "Accuracy",
+      "timeAgo": "ago"
+    },
+    "achievements": {
+      "title": "Recent Achievements",
+      "perfectSession": "Perfect Session",
+      "quickLearner": "Quick Learner",
+      "consistent": "Consistent Player",
+      "perfectSessionDesc": "100% accuracy in last session",
+      "quickLearnerDesc": "Fast improvement rate",
+      "consistentDesc": "7 days in a row"
+    }
+  },
+  "training": {
+    "title": "Training Mode",
+    "gameFormat": "Game Format",
+    "sessionStats": {
+      "hands": "Hands",
+      "correct": "Correct",
+      "accuracy": "Accuracy"
+    },
+    "handInfo": {
+      "position": "Position",
+      "stackSize": "Stack Size",
+      "potSize": "Pot Size",
+      "blindLevel": "Blind Level",
+      "ante": "Ante",
+      "action": "Action"
+    },
+    "actions": {
+      "fold": "Fold",
+      "call": "Call",
+      "raise": "Raise",
+      "allIn": "All-In"
+    },
+    "raiseSizing": "Raise 2.5x",
+    "raiseLarge": "Raise 3.5x",
+    "yourCards": "Your Cards",
+    "board": "Board",
+    "yourDecision": "What's your optimal decision?",
+    "results": {
+      "correct": "✅ Correct! This matches GTO strategy.",
+      "incorrect": "❌ GTO suggests:",
+      "gtoChoice": "GTO Choice",
+      "yourChoice": "Your Choice",
+      "explanation": "Explanation"
+    },
+    "explanations": {
+      "cashCorrect": "Perfect! This is the optimal play given the board texture and position.",
+      "tourCorrect": "Excellent! This decision maximizes your tournament equity.",
+      "cashIncorrect": "This play isn't optimal. Consider the pot odds and opponent's range.",
+      "tourIncorrect": "In tournaments, ICM pressure affects this decision significantly."
+    },
+    "buttons": {
+      "nextHand": "Next Hand",
+      "endSession": "End Session",
+      "viewStats": "View Stats"
+    }
+  },
+  "camera": {
+    "title": "Live Solver",
+    "subtitle": "Real-time poker analysis",
+    "mode": "Mode",
+    "tableView": "Poker Table View",
+    "positionPhone": "Position your phone to capture the",
+    "table": "table",
+    "optimizedDeep": "Optimized for deep stack analysis",
+    "optimizedShort": "Optimized for short stack decisions",
+    "autoCapture": "Auto Capture",
+    "stopAuto": "Stop Auto",
+    "autoInterval": "situations every 2 seconds",
+    "avgAnalysis": "Avg Analysis",
+    "pushFolds": "Push/Folds",
+    "decisions": "Decisions",
+    "capture": "Capture Cards",
+    "analyzing": "Analyzing...",
+    "results": "Analysis Results",
+    "confidence": "Confidence",
+    "recommendation": "Recommendation",
+    "alternativeActions": "Alternative Actions",
+    "buttons": {
+      "retake": "Retake",
+      "analyze": "Analyze",
+      "saveResult": "Save Result"
+    }
+  },
+  "stats": {
+    "title": "Statistics",
+    "subtitle": "Track your GTO progress",
+    "overview": {
+      "title": "Overview",
+      "totalHands": "Hands Played",
+      "winRate": "Win Rate",
+      "hourlyRate": "Hourly Rate",
+      "variance": "Variance",
+      "accuracy": "Accuracy"
+    },
+    "performance": {
+      "title": "Performance",
+      "accuracy": "Accuracy",
+      "improvement": "Improvement",
+      "weakSpots": "Weak Spots",
+      "strengths": "Strengths",
+      "studyTime": "Study Time"
+    },
+    "charts": {
+      "daily": "Daily",
+      "weekly": "Weekly",
+      "monthly": "Monthly",
+      "progress": "Progress Over Time",
+      "position": "Position Analysis",
+      "gameType": "By Game Type"
+    },
+    "positions": {
+      "button": "Button",
+      "cutoff": "Cut-off",
+      "bigBlind": "Big Blind",
+      "smallBlind": "Small Blind",
+      "utg": "UTG"
+    },
+    "hands": "hands",
+    "thisWeek": "156 this week",
+    "cashGames": "Cash games",
+    "accuracyTrend": "Accuracy Trend",
+    "last7Days": "Last 7 days",
+    "recentSessions": "Recent Sessions",
+    "viewAll": "View All",
+    "quickActions": "Quick Actions",
+    "exportData": "Export Data",
+    "resetStats": "Reset Stats"
+  },
+  "profile": {
+    "title": "Profile",
+    "quickSettings": "Quick Settings",
+    "gamePreferences": "Game Preferences",
+    "trainingSettings": "Training Settings",
+    "dataPrivacy": "Data & Privacy",
+    "supportAbout": "Support & About",
+    "subscription": "Subscription",
+    "settings": {
+      "language": "Language",
+      "notifications": "Push Notifications",
+      "autoCapture": "Auto Camera Capture",
+      "hapticFeedback": "Haptic Feedback",
+      "defaultGameType": "Default Game Type",
+      "stackSize": "Stack Size",
+      "analysisSpeed": "Analysis Speed",
+      "difficultyLevel": "Difficulty Level",
+      "sessionLength": "Session Length",
+      "focusAreas": "Focus Areas",
+      "exportHandHistory": "Export Hand History",
+      "clearCache": "Clear Cache",
+      "privacyPolicy": "Privacy Policy",
+      "helpFAQ": "Help & FAQ",
+      "contactSupport": "Contact Support",
+      "about": "About"
+    },
+    "subscriptionInfo": {
+      "title": "GTO Pro",
+      "status": "Active",
+      "description": "Unlimited analysis, advanced training modes, and priority support",
+      "renewsOn": "Renews on",
+      "manageSubscription": "Manage Subscription"
+    },
+    "signOut": "Sign Out"
+  },
+  "explore": {
+    "title": "Explore",
+    "featuredContent": "Featured Content",
+    "tutorials": "Tutorials",
+    "strategies": "Strategies",
+    "tools": "Tools"
+  },
+  "navigation": {
+    "home": "Home",
+    "training": "Training", 
+    "solver": "Solver",
+    "stats": "Stats",
+    "profile": "Profile",
+    "explore": "Explore"
+  }
+} 

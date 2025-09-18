@@ -1,0 +1,317 @@
+{
+  "common": {
+    "ok": "موافق",
+    "cancel": "إلغاء",
+    "success": "نجح",
+    "error": "خطأ",
+    "close": "إغلاق",
+    "save": "حفظ",
+    "language": "اللغة",
+    "settings": "الإعدادات",
+    "loading": "جاري التحميل...",
+    "yes": "نعم",
+    "no": "لا"
+  },
+  "languages": {
+    "english": "الإنجليزية",
+    "danish": "الدانماركية",
+    "arabic": "العربية"
+  },
+  "welcome": {
+    "title": "مساعد البوكر الاستراتيجي",
+    "subtitle": "إتقان البوكر بالتحليل المدعوم بالذكاء الاصطناعي",
+    "features": {
+      "liveAnalysis": {
+        "title": "التحليل المباشر",
+        "description": "قرارات GTO في الوقت الفعلي في أقل من 3 ثوانِ"
+      },
+      "trainingMode": {
+        "title": "وضع التدريب",
+        "description": "تدرب مع سيناريوهات تفاعلية"
+      },
+      "performanceTracking": {
+        "title": "تتبع الأداء",
+        "description": "تحليلات مفصلة وتقارير التقدم"
+      }
+    },
+    "buttons": {
+      "getStarted": "ابدأ الآن",
+      "alreadyHaveAccount": "لدي حساب بالفعل"
+    },
+    "footer": "انضم إلى آلاف اللاعبين الذين يحسنون لعبتهم"
+  },
+  "auth": {
+    "login": {
+      "title": "مرحباً بعودتك",
+      "subtitle": "سجل الدخول لمتابعة رحلة البوكر الخاصة بك",
+      "emailLabel": "عنوان البريد الإلكتروني",
+      "emailPlaceholder": "أدخل بريدك الإلكتروني",
+      "passwordLabel": "كلمة المرور",
+      "passwordPlaceholder": "أدخل كلمة المرور",
+      "forgotPassword": "نسيت كلمة المرور؟",
+      "signIn": "تسجيل الدخول",
+      "signingIn": "جاري تسجيل الدخول...",
+      "orContinueWith": "أو تابع مع",
+      "google": "جوجل",
+      "apple": "آبل",
+      "dontHaveAccount": "ليس لديك حساب؟",
+      "signUp": "اشترك"
+    },
+    "register": {
+      "title": "إنشاء حساب",
+      "subtitle": "انضم إلى آلاف اللاعبين الذين يحسنون لعبتهم",
+      "fullNameLabel": "الاسم الكامل",
+      "fullNamePlaceholder": "أدخل اسمك الكامل",
+      "emailLabel": "عنوان البريد الإلكتروني",
+      "emailPlaceholder": "أدخل بريدك الإلكتروني",
+      "passwordLabel": "كلمة المرور",
+      "passwordPlaceholder": "أنشئ كلمة مرور",
+      "confirmPasswordLabel": "تأكيد كلمة المرور",
+      "confirmPasswordPlaceholder": "أكد كلمة المرور",
+      "passwordHint": "6 أحرف على الأقل",
+      "agreeToTerms": "أوافق على",
+      "termsOfService": "شروط الخدمة",
+      "and": "و",
+      "privacyPolicy": "سياسة الخصوصية",
+      "createAccount": "إنشاء حساب",
+      "creatingAccount": "جاري إنشاء الحساب...",
+      "alreadyHaveAccount": "لديك حساب بالفعل؟",
+      "signIn": "تسجيل الدخول",
+      "chooseAvatar": "اختر الصورة الرمزية",
+      "uploadYourPhoto": "ارفع صورتك",
+      "gallery": "المعرض",
+      "camera": "الكاميرا"
+    },
+    "errors": {
+      "fillAllFields": "يرجى ملء جميع الحقول",
+      "enterFullName": "يرجى إدخال اسمك الكامل",
+      "enterEmail": "يرجى إدخال عنوان بريدك الإلكتروني",
+      "validEmail": "يرجى إدخال عنوان بريد إلكتروني صحيح",
+      "passwordLength": "يجب أن تكون كلمة المرور 6 أحرف على الأقل",
+      "passwordsMatch": "كلمات المرور غير متطابقة",
+      "agreeToTerms": "يرجى الموافقة على شروط الخدمة وسياسة الخصوصية"
+    },
+    "success": {
+      "loginSuccessful": "تم تسجيل الدخول بنجاح!",
+      "accountCreated": "تم إنشاء الحساب بنجاح!"
+    }
+  },
+  "dashboard": {
+    "greeting": "مرحباً بعودتك",
+    "subtitle": "هل أنت مستعد لتحسين لعبتك؟",
+    "dailyGoal": "الهدف اليومي",
+    "handsPlayed": "الأيدي المُلعبة",
+    "accuracy": "الدقة",
+    "studyTime": "وقت الدراسة",
+    "gameMode": {
+      "title": "وضع اللعب",
+      "cash": {
+        "title": "ألعاب النقد",
+        "subtitle": "استراتيجية كومة عميقة • 100bb+",
+        "description": "أتقن لعب الكومة العميقة مع النطاقات والأحجام المثلى"
+      },
+      "tournaments": {
+        "title": "سبين آند غو",
+        "subtitle": "كومة قصيرة • إيقاع سريع",
+        "description": "قرارات push/fold مثالية واستراتيجية الهايبر تيربو"
+      }
+    },
+    "quickActions": {
+      "title": "الإجراءات السريعة",
+      "startSession": "بدء جلسة",
+      "reviewHands": "مراجعة الأيدي",
+      "practiceSpots": "ممارسة المواقف",
+      "analyzeHand": "تحليل اليد",
+      "practice": "ممارسة السيناريوهات",
+      "analyze": "أدوات التحليل",
+      "scenarios": "مواقف التدريب",
+      "liveAnalysis": "تحليل GTO مباشر"
+    },
+    "recentSessions": {
+      "title": "الجلسات الأخيرة",
+      "noSessions": "لا توجد جلسات حديثة",
+      "viewAll": "عرض الكل",
+      "gameType": "نوع اللعبة",
+      "position": "الموقع",
+      "accuracy": "الدقة",
+      "timeAgo": "منذ"
+    },
+    "achievements": {
+      "title": "الإنجازات الأخيرة",
+      "perfectSession": "جلسة مثالية",
+      "quickLearner": "متعلم سريع",
+      "consistent": "لاعب ثابت",
+      "perfectSessionDesc": "دقة 100% في آخر جلسة",
+      "quickLearnerDesc": "معدل تحسن سريع",
+      "consistentDesc": "7 أيام متتالية"
+    }
+  },
+  "training": {
+    "title": "وضع التدريب",
+    "gameFormat": "تنسيق اللعبة",
+    "sessionStats": {
+      "hands": "الأيدي",
+      "correct": "صحيح",
+      "accuracy": "الدقة"
+    },
+    "handInfo": {
+      "position": "الموقع",
+      "stackSize": "حجم الكومة",
+      "potSize": "حجم الوعاء",
+      "blindLevel": "مستوى البلايند",
+      "ante": "الأنتي",
+      "action": "الإجراء"
+    },
+    "actions": {
+      "fold": "فولد",
+      "call": "كول",
+      "raise": "رفع",
+      "allIn": "الكل"
+    },
+    "raiseSizing": "رفع 2.5x",
+    "raiseLarge": "رفع 3.5x",
+    "yourCards": "أوراقك",
+    "board": "اللوحة",
+    "yourDecision": "ما هو قرارك الأمثل؟",
+    "results": {
+      "correct": "✅ صحيح! هذا يطابق استراتيجية GTO.",
+      "incorrect": "❌ GTO يقترح:",
+      "gtoChoice": "خيار GTO",
+      "yourChoice": "خيارك",
+      "explanation": "التفسير"
+    },
+    "explanations": {
+      "cashCorrect": "مثالي! هذا هو اللعب الأمثل نظراً لنسيج اللوحة والموقع.",
+      "tourCorrect": "ممتاز! هذا القرار يزيد من قيمتك في البطولة.",
+      "cashIncorrected": "هذا اللعب ليس مثالياً. فكر في نسب الوعاء ومجال الخصم.",
+      "tourIncorrect": "في البطولات، ضغط ICM يؤثر على هذا القرار بشكل كبير."
+    },
+    "buttons": {
+      "nextHand": "اليد التالية",
+      "endSession": "إنهاء الجلسة",
+      "viewStats": "عرض الإحصائيات"
+    }
+  },
+  "camera": {
+    "title": "الحلال المباشر",
+    "subtitle": "تحليل البوكر في الوقت الفعلي",
+    "mode": "الوضع",
+    "tableView": "عرض طاولة البوكر",
+    "positionPhone": "ضع هاتفك لالتقاط",
+    "table": "الطاولة",
+    "optimizedDeep": "محسن لتحليل الكومة العميقة",
+    "optimizedShort": "محسن لقرارات الكومة القصيرة",
+    "autoCapture": "التقاط تلقائي",
+    "stopAuto": "إيقاف التلقائي",
+    "autoInterval": "المواقف كل ثانيتين",
+    "avgAnalysis": "متوسط التحليل",
+    "pushFolds": "دفع/طي",
+    "decisions": "القرارات",
+    "capture": "التقاط البطاقات",
+    "analyzing": "جاري التحليل...",
+    "results": "نتائج التحليل",
+    "confidence": "الثقة",
+    "recommendation": "التوصية",
+    "alternativeActions": "الإجراءات البديلة",
+    "buttons": {
+      "retake": "إعادة التقاط",
+      "analyze": "تحليل",
+      "saveResult": "حفظ النتيجة"
+    }
+  },
+  "stats": {
+    "title": "الإحصائيات",
+    "subtitle": "تتبع تقدم GTO الخاص بك",
+    "overview": {
+      "title": "نظرة عامة",
+      "totalHands": "الأيدي المُلعبة",
+      "winRate": "معدل الفوز",
+      "hourlyRate": "المعدل بالساعة",
+      "variance": "التباين",
+      "accuracy": "الدقة"
+    },
+    "performance": {
+      "title": "الأداء",
+      "accuracy": "الدقة",
+      "improvement": "التحسن",
+      "weakSpots": "النقاط الضعيفة",
+      "strengths": "نقاط القوة",
+      "studyTime": "وقت الدراسة"
+    },
+    "charts": {
+      "daily": "يومي",
+      "weekly": "أسبوعي",
+      "monthly": "شهري",
+      "progress": "التقدم مع الوقت",
+      "position": "تحليل الموقع",
+      "gameType": "حسب نوع اللعبة"
+    },
+    "positions": {
+      "button": "الزر",
+      "cutoff": "الكت-أوف",
+      "bigBlind": "البلايند الكبير",
+      "smallBlind": "البلايند الصغير",
+      "utg": "UTG"
+    },
+    "hands": "أيدي",
+    "thisWeek": "156 هذا الأسبوع",
+    "cashGames": "ألعاب النقد",
+    "accuracyTrend": "اتجاه الدقة",
+    "last7Days": "آخر 7 أيام",
+    "recentSessions": "الجلسات الأخيرة",
+    "viewAll": "عرض الكل",
+    "quickActions": "الإجراءات السريعة",
+    "exportData": "تصدير البيانات",
+    "resetStats": "إعادة تعيين الإحصائيات"
+  },
+  "profile": {
+    "title": "الملف الشخصي",
+    "quickSettings": "الإعدادات السريعة",
+    "gamePreferences": "تفضيلات اللعبة",
+    "trainingSettings": "إعدادات التدريب",
+    "dataPrivacy": "البيانات والخصوصية",
+    "supportAbout": "الدعم وحول",
+    "subscription": "الاشتراك",
+    "settings": {
+      "language": "اللغة",
+      "notifications": "الإشعارات الفورية",
+      "autoCapture": "التقاط الكاميرا التلقائي",
+      "hapticFeedback": "التفاعل اللمسي",
+      "defaultGameType": "نوع اللعبة الافتراضي",
+      "stackSize": "حجم الكومة",
+      "analysisSpeed": "سرعة التحليل",
+      "difficultyLevel": "مستوى الصعوبة",
+      "sessionLength": "مدة الجلسة",
+      "focusAreas": "مناطق التركيز",
+      "exportHandHistory": "تصدير تاريخ الأيدي",
+      "clearCache": "مسح التخزين المؤقت",
+      "privacyPolicy": "سياسة الخصوصية",
+      "helpFAQ": "المساعدة والأسئلة الشائعة",
+      "contactSupport": "اتصل بالدعم",
+      "about": "حول"
+    },
+    "subscriptionInfo": {
+      "title": "GTO برو",
+      "status": "نشط",
+      "description": "تحليل غير محدود وأوضاع تدريب متقدمة ودعم ذو أولوية",
+      "renewsOn": "يتجدد في",
+      "manageSubscription": "إدارة الاشتراك"
+    },
+    "signOut": "تسجيل الخروج"
+  },
+  "explore": {
+    "title": "استكشف",
+    "featuredContent": "المحتوى المميز",
+    "tutorials": "دروس تعليمية",
+    "strategies": "الاستراتيجيات",
+    "tools": "الأدوات"
+  },
+  "navigation": {
+    "home": "الرئيسية",
+    "training": "التدريب",
+    "solver": "الحلال",
+    "stats": "الإحصائيات",
+    "profile": "الملف الشخصي",
+    "explore": "استكشف"
+  }
+} 

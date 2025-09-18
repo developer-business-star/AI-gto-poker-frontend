@@ -1,0 +1,317 @@
+{
+  "common": {
+    "ok": "OK",
+    "cancel": "Annuller",
+    "success": "Succes",
+    "error": "Fejl",
+    "close": "Luk",
+    "save": "Gem",
+    "language": "Sprog",
+    "settings": "Indstillinger",
+    "loading": "Indlæser...",
+    "yes": "Ja",
+    "no": "Nej"
+  },
+  "languages": {
+    "english": "Engelsk",
+    "danish": "Dansk",
+    "arabic": "Arabisk"
+  },
+  "welcome": {
+    "title": "GTO Poker Assistent",
+    "subtitle": "Mester Poker med AI-drevet Analyse",
+    "features": {
+      "liveAnalysis": {
+        "title": "Live Analyse",
+        "description": "Real-time GTO beslutninger på under 3 sekunder"
+      },
+      "trainingMode": {
+        "title": "Trænings Tilstand",
+        "description": "Øv dig med interaktive scenarier"
+      },
+      "performanceTracking": {
+        "title": "Præstations Sporing",
+        "description": "Detaljerede analyser og fremskridtsrapporter"
+      }
+    },
+    "buttons": {
+      "getStarted": "Kom i Gang",
+      "alreadyHaveAccount": "Jeg Har Allerede en Konto"
+    },
+    "footer": "Tilslut dig tusindvis af spillere, der forbedrer deres spil"
+  },
+  "auth": {
+    "login": {
+      "title": "Velkommen Tilbage",
+      "subtitle": "Log ind for at fortsætte din poker rejse",
+      "emailLabel": "Email Adresse",
+      "emailPlaceholder": "Indtast din email",
+      "passwordLabel": "Adgangskode",
+      "passwordPlaceholder": "Indtast din adgangskode",
+      "forgotPassword": "Glemt Adgangskode?",
+      "signIn": "Log Ind",
+      "signingIn": "Logger Ind...",
+      "orContinueWith": "eller fortsæt med",
+      "google": "Google",
+      "apple": "Apple",
+      "dontHaveAccount": "Har du ikke en konto?",
+      "signUp": "Tilmeld Dig"
+    },
+    "register": {
+      "title": "Opret Konto",
+      "subtitle": "Tilslut dig tusindvis af spillere, der forbedrer deres spil",
+      "fullNameLabel": "Fulde Navn",
+      "fullNamePlaceholder": "Indtast dit fulde navn",
+      "emailLabel": "Email Adresse",
+      "emailPlaceholder": "Indtast din email",
+      "passwordLabel": "Adgangskode",
+      "passwordPlaceholder": "Opret en adgangskode",
+      "confirmPasswordLabel": "Bekræft Adgangskode",
+      "confirmPasswordPlaceholder": "Bekræft din adgangskode",
+      "passwordHint": "Mindst 6 tegn",
+      "agreeToTerms": "Jeg accepterer",
+      "termsOfService": "Servicevilkårene",
+      "and": "og",
+      "privacyPolicy": "Privatlivspolitikken",
+      "createAccount": "Opret Konto",
+      "creatingAccount": "Opretter Konto...",
+      "alreadyHaveAccount": "Har du allerede en konto?",
+      "signIn": "Log Ind",
+      "chooseAvatar": "Vælg Avatar",
+      "uploadYourPhoto": "Upload Dit Billede",
+      "gallery": "Galleri",
+      "camera": "Kamera"
+    },
+    "errors": {
+      "fillAllFields": "Udfyld venligst alle felter",
+      "enterFullName": "Indtast venligst dit fulde navn",
+      "enterEmail": "Indtast venligst din email adresse",
+      "validEmail": "Indtast venligst en gyldig email adresse",
+      "passwordLength": "Adgangskoden skal være mindst 6 tegn lang",
+      "passwordsMatch": "Adgangskoderne stemmer ikke overens",
+      "agreeToTerms": "Accepter venligst Servicevilkårene og Privatlivspolitikken"
+    },
+    "success": {
+      "loginSuccessful": "Login succesfuldt!",
+      "accountCreated": "Konto oprettet succesfuldt!"
+    }
+  },
+  "dashboard": {
+    "greeting": "Velkommen tilbage",
+    "subtitle": "Klar til at forbedre dit spil?",
+    "dailyGoal": "Dagligt Mål",
+    "handsPlayed": "Hænder Spillet",
+    "accuracy": "Nøjagtighed",
+    "studyTime": "Studietid",
+    "gameMode": {
+      "title": "Spil Tilstand",
+      "cash": {
+        "title": "Cash Spil",
+        "subtitle": "Dyb stak strategi • 100bb+",
+        "description": "Mester dyb stak spil med optimale ranges og sizing"
+      },
+      "tournaments": {
+        "title": "Spin & Go",
+        "subtitle": "Kort stak • Hurtig tempo",
+        "description": "Perfekte push/fold beslutninger og hyper-turbo strategi"
+      }
+    },
+    "quickActions": {
+      "title": "Hurtige Handlinger",
+      "startSession": "Start Session",
+      "reviewHands": "Gennemgå Hænder",
+      "practiceSpots": "Øv Spots",
+      "analyzeHand": "Analyser Hånd",
+      "practice": "Øv scenarier",
+      "analyze": "Analyse værktøjer",
+      "scenarios": "Trænings spots",
+      "liveAnalysis": "Live GTO analyse"
+    },
+    "recentSessions": {
+      "title": "Seneste Sessioner",
+      "noSessions": "Ingen seneste sessioner",
+      "viewAll": "Se Alle",
+      "gameType": "Spil Type",
+      "position": "Position",
+      "accuracy": "Nøjagtighed",
+      "timeAgo": "siden"
+    },
+    "achievements": {
+      "title": "Seneste Præstationer",
+      "perfectSession": "Perfekt Session",
+      "quickLearner": "Hurtig Lærende",
+      "consistent": "Konsistente Spiller",
+      "perfectSessionDesc": "100% nøjagtighed i sidste session",
+      "quickLearnerDesc": "Hurtig forbedringsrate",
+      "consistentDesc": "7 dage i træk"
+    }
+  },
+  "training": {
+    "title": "Trænings Tilstand",
+    "gameFormat": "Spil Format",
+    "sessionStats": {
+      "hands": "Hænder",
+      "correct": "Korrekte",
+      "accuracy": "Nøjagtighed"
+    },
+    "handInfo": {
+      "position": "Position",
+      "stackSize": "Stak Størrelse",
+      "potSize": "Pot Størrelse",
+      "blindLevel": "Blind Niveau",
+      "ante": "Ante",
+      "action": "Handling"
+    },
+    "actions": {
+      "fold": "Fold",
+      "call": "Call",
+      "raise": "Raise",
+      "allIn": "All-In"
+    },
+    "raiseSizing": "Raise 2.5x",
+    "raiseLarge": "Raise 3.5x",
+    "yourCards": "Dine Kort",
+    "board": "Bordet",
+    "yourDecision": "Hvad er din optimale beslutning?",
+    "results": {
+      "correct": "✅ Korrekt! Dette matcher GTO strategi.",
+      "incorrect": "❌ GTO foreslår:",
+      "gtoChoice": "GTO Valg",
+      "yourChoice": "Dit Valg",
+      "explanation": "Forklaring"
+    },
+    "explanations": {
+      "cashCorrect": "Perfekt! Dette er det optimale spil givet bordteksturen og positionen.",
+      "tourCorrect": "Fremragende! Denne beslutning maksimerer din turnerings equity.",
+      "cashIncorrect": "Dette spil er ikke optimalt. Overvej pot odds og modstanderens range.",
+      "tourIncorrect": "I turneringer påvirker ICM pres denne beslutning betydeligt."
+    },
+    "buttons": {
+      "nextHand": "Næste Hånd",
+      "endSession": "Afslut Session",
+      "viewStats": "Se Statistikker"
+    }
+  },
+  "camera": {
+    "title": "Live Solver",
+    "subtitle": "Real-time poker analyse",
+    "mode": "Tilstand",
+    "tableView": "Poker Bord Visning",
+    "positionPhone": "Placer din telefon for at fange",
+    "table": "bordet",
+    "optimizedDeep": "Optimeret til dyb stak analyse",
+    "optimizedShort": "Optimeret til kort stak beslutninger",
+    "autoCapture": "Auto Optagelse",
+    "stopAuto": "Stop Auto",
+    "autoInterval": "situationer hvert 2. sekund",
+    "avgAnalysis": "Gns Analyse",
+    "pushFolds": "Push/Folds",
+    "decisions": "Beslutninger",
+    "capture": "Tag Kort",
+    "analyzing": "Analyserer...",
+    "results": "Analyse Resultater",
+    "confidence": "Tillid",
+    "recommendation": "Anbefaling",
+    "alternativeActions": "Alternative Handlinger",
+    "buttons": {
+      "retake": "Tag Igen",
+      "analyze": "Analyser",
+      "saveResult": "Gem Resultat"
+    }
+  },
+  "stats": {
+    "title": "Statistikker",
+    "subtitle": "Spor dit GTO fremskridt",
+    "overview": {
+      "title": "Oversigt",
+      "totalHands": "Hænder Spillet",
+      "winRate": "Vindende Rate",
+      "hourlyRate": "Time Rate",
+      "variance": "Varians",
+      "accuracy": "Nøjagtighed"
+    },
+    "performance": {
+      "title": "Præstation",
+      "accuracy": "Nøjagtighed",
+      "improvement": "Forbedring",
+      "weakSpots": "Svage Spots",
+      "strengths": "Styrker",
+      "studyTime": "Studietid"
+    },
+    "charts": {
+      "daily": "Dagligt",
+      "weekly": "Ugentligt",
+      "monthly": "Månedligt",
+      "progress": "Fremskridt Over Tid",
+      "position": "Positions Analyse",
+      "gameType": "Efter Spil Type"
+    },
+    "positions": {
+      "button": "Button",
+      "cutoff": "Cut-off",
+      "bigBlind": "Big Blind",
+      "smallBlind": "Small Blind",
+      "utg": "UTG"
+    },
+    "hands": "hænder",
+    "thisWeek": "156 denne uge",
+    "cashGames": "Cash spil",
+    "accuracyTrend": "Nøjagtigheds Trend",
+    "last7Days": "Sidste 7 dage",
+    "recentSessions": "Seneste Sessioner",
+    "viewAll": "Se Alle",
+    "quickActions": "Hurtige Handlinger",
+    "exportData": "Eksporter Data",
+    "resetStats": "Nulstil Statistikker"
+  },
+  "profile": {
+    "title": "Profil",
+    "quickSettings": "Hurtige Indstillinger",
+    "gamePreferences": "Spil Præferencer",
+    "trainingSettings": "Trænings Indstillinger",
+    "dataPrivacy": "Data & Privatliv",
+    "supportAbout": "Support & Om",
+    "subscription": "Abonnement",
+    "settings": {
+      "language": "Sprog",
+      "notifications": "Push Notifikationer",
+      "autoCapture": "Auto Kamera Optagelse",
+      "hapticFeedback": "Haptisk Feedback",
+      "defaultGameType": "Standard Spil Type",
+      "stackSize": "Stak Størrelse",
+      "analysisSpeed": "Analyse Hastighed",
+      "difficultyLevel": "Sværhedsgrad",
+      "sessionLength": "Session Længde",
+      "focusAreas": "Focus Områder",
+      "exportHandHistory": "Eksporter Hånd Historie",
+      "clearCache": "Ryd Cache",
+      "privacyPolicy": "Privatlivspolitik",
+      "helpFAQ": "Hjælp & FAQ",
+      "contactSupport": "Kontakt Support",
+      "about": "Om"
+    },
+    "subscriptionInfo": {
+      "title": "GTO Pro",
+      "status": "Aktiv",
+      "description": "Ubegrænset analyse, avancerede trænings tilstande og prioritet support",
+      "renewsOn": "Fornyes den",
+      "manageSubscription": "Administrer Abonnement"
+    },
+    "signOut": "Log Ud"
+  },
+  "explore": {
+    "title": "Udforsk",
+    "featuredContent": "Fremhævet Indhold",
+    "tutorials": "Tutorials",
+    "strategies": "Strategier",
+    "tools": "Værktøjer"
+  },
+  "navigation": {
+    "home": "Hjem",
+    "training": "Træning",
+    "solver": "Solver",
+    "stats": "Statistikker",
+    "profile": "Profil",
+    "explore": "Udforsk"
+  }
+} 
