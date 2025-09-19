@@ -6,6 +6,7 @@ import { useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { ScrollView, StyleSheet, Switch, Text, TouchableOpacity, View } from 'react-native';
 import { useAuth } from '@/contexts/AuthContext';
+import { useTheme } from '@/contexts/ThemeContext';
 import { useUserStats } from '@/hooks/useUserStats';
 import { API_CONFIG } from '@/config/api';
 import React, { useState, useEffect } from 'react';
@@ -43,11 +44,11 @@ interface ComprehensiveStats {
 
 export default function ProfileScreen() {
   const [notifications, setNotifications] = React.useState(true);
-  const [colorPalette, setColorPalette] = React.useState(false);
   const [hapticFeedback, setHapticFeedback] = React.useState(true);
   const router = useRouter();
   const { t } = useTranslation();
   const { user, logout, isLoading, token, isLoading: authLoading } = useAuth();
+  const { colors, isDark, toggleTheme } = useTheme();
   const { stats } = useUserStats();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -163,7 +164,7 @@ export default function ProfileScreen() {
   ];
 
   return (
-    <ThemedView style={styles.container}>
+    <ThemedView style={[styles.container, { backgroundColor: colors.background }]}>
       <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
         {/* Header */}
         <View style={styles.header}>
@@ -174,72 +175,84 @@ export default function ProfileScreen() {
               color="white" 
             />
           </View>
-          <ThemedText style={styles.name}>{user.fullName}</ThemedText>
-          <ThemedText style={styles.email}>{user.email}</ThemedText>
+          <ThemedText style={[styles.name, { color: colors.text }]}>{user.fullName}</ThemedText>
+          <ThemedText style={[styles.email, { color: colors.textSecondary }]}>{user.email}</ThemedText>
           <View style={styles.badgeContainer}>
-            <View style={styles.badge}>
+            <View style={[styles.badge, { backgroundColor: colors.primary }]}>
               <Text style={styles.badgeText}>{t('profile.subscriptionInfo.title')}</Text>
             </View>
           </View>
         </View>
 
         {/* Quick Stats */}
-        <View style={styles.quickStats}>
+        <View style={[styles.quickStats, { backgroundColor: colors.card, shadowColor: colors.shadow }]}>
           <View style={styles.quickStatItem}>
-            <Text style={styles.quickStatValue}>{comprehensiveStats?.overallAccuracy ? comprehensiveStats?.overallAccuracy : '···'}%</Text>
-            <Text style={styles.quickStatLabel}>{t('dashboard.accuracy')}</Text>
+            <Text style={[styles.quickStatValue, { color: colors.text }]}>
+              {comprehensiveStats?.overallAccuracy ? comprehensiveStats?.overallAccuracy : '···'}%
+            </Text>
+            <Text style={[styles.quickStatLabel, { color: colors.textSecondary }]}>
+              {t('dashboard.accuracy')}
+            </Text>
           </View>
-          <View style={styles.quickStatDivider} />
+          <View style={[styles.quickStatDivider, { backgroundColor: colors.divider }]} />
           <View style={styles.quickStatItem}>
-            <Text style={styles.quickStatValue}>{comprehensiveStats?.handsPlayed.toLocaleString() ? comprehensiveStats?.handsPlayed.toLocaleString() : '···'}</Text>
-            <Text style={styles.quickStatLabel}>{t('dashboard.handsPlayed')}</Text>
+            <Text style={[styles.quickStatValue, { color: colors.text }]}>
+              {comprehensiveStats?.handsPlayed.toLocaleString() ? comprehensiveStats?.handsPlayed.toLocaleString() : '···'}
+            </Text>
+            <Text style={[styles.quickStatLabel, { color: colors.textSecondary }]}>
+              {t('dashboard.handsPlayed')}
+            </Text>
           </View>
-          <View style={styles.quickStatDivider} />
+          <View style={[styles.quickStatDivider, { backgroundColor: colors.divider }]} />
           <View style={styles.quickStatItem}>
-            <Text style={styles.quickStatValue}>{comprehensiveStats?.studyTime ? comprehensiveStats?.studyTime : '···h'}</Text>
-            <Text style={styles.quickStatLabel}>{t('dashboard.studyTime')}</Text>
+            <Text style={[styles.quickStatValue, { color: colors.text }]}>
+              {comprehensiveStats?.studyTime ? comprehensiveStats?.studyTime : '···h'}
+            </Text>
+            <Text style={[styles.quickStatLabel, { color: colors.textSecondary }]}>
+              {t('dashboard.studyTime')}
+            </Text>
           </View>
         </View>
 
         {/* User Info */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Account Information</Text>
-          <View style={styles.menuGroup}>
-            <View style={styles.menuItem}>
+          <Text style={[styles.sectionTitle, { color: colors.text }]}>Account Information</Text>
+          <View style={[styles.menuGroup, { backgroundColor: colors.card, borderColor: colors.border }]}>
+            <View style={[styles.menuItem, { borderBottomColor: colors.divider }]}>
               <View style={styles.menuLeft}>
-                <View style={[styles.iconBackground, { backgroundColor: '#007AFF15' }]}>
-                  <Ionicons name="calendar" size={18} color="#007AFF" />
+                <View style={[styles.iconBackground, { backgroundColor: colors.primaryLight }]}>
+                  <Ionicons name="calendar" size={18} color={colors.primary} />
                 </View>
-                <Text style={styles.menuLabel}>Member Since</Text>
+                <Text style={[styles.menuLabel, { color: colors.text }]}>Member Since</Text>
               </View>
               <View style={styles.menuRight}>
-                <Text style={styles.menuValue}>
+                <Text style={[styles.menuValue, { color: colors.textSecondary }]}>
                   {new Date(user.createdAt).toLocaleDateString()}
                 </Text>
               </View>
             </View>
             
-            <View style={styles.menuItem}>
+            <View style={[styles.menuItem, { borderBottomColor: colors.divider }]}>
               <View style={styles.menuLeft}>
-                <View style={[styles.iconBackground, { backgroundColor: '#22c55e15' }]}>
-                  <Ionicons name="shield-checkmark" size={18} color="#22c55e" />
+                <View style={[styles.iconBackground, { backgroundColor: colors.success + '15' }]}>
+                  <Ionicons name="shield-checkmark" size={18} color={colors.success} />
                 </View>
-                <Text style={styles.menuLabel}>Account Status</Text>
+                <Text style={[styles.menuLabel, { color: colors.text }]}>Account Status</Text>
               </View>
               <View style={styles.menuRight}>
-                <Text style={[styles.menuValue, { color: '#22c55e' }]}>{user?.isActive ? 'Active' : 'Inactive'}</Text>
+                <Text style={[styles.menuValue, { color: colors.success }]}>{user?.isActive ? 'Active' : 'Inactive'}</Text>
               </View>
             </View>
             
             <View style={styles.menuItem}>
               <View style={styles.menuLeft}>
-                <View style={[styles.iconBackground, { backgroundColor: '#f59e0b15' }]}>
-                  <Ionicons name="trophy" size={18} color="#f59e0b" />
+                <View style={[styles.iconBackground, { backgroundColor: colors.warning + '15' }]}>
+                  <Ionicons name="trophy" size={18} color={colors.warning} />
                 </View>
-                <Text style={styles.menuLabel}>Best Accuracy</Text>
+                <Text style={[styles.menuLabel, { color: colors.text }]}>Best Accuracy</Text>
               </View>
               <View style={styles.menuRight}>
-                <Text style={styles.menuValue}>{comprehensiveStats?.bestAccuracy ? comprehensiveStats?.bestAccuracy : '···'}%</Text>
+                <Text style={[styles.menuValue, { color: colors.textSecondary }]}>{comprehensiveStats?.bestAccuracy ? comprehensiveStats?.bestAccuracy : '···'}%</Text>
               </View>
             </View>
           </View>
@@ -247,13 +260,13 @@ export default function ProfileScreen() {
 
         {/* Settings Toggle */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>{t('profile.quickSettings')}</Text>
-          <View style={styles.settingsGroup}>
+          <Text style={[styles.sectionTitle, { color: colors.text }]}>{t('profile.quickSettings')}</Text>
+          <View style={[styles.settingsGroup, { backgroundColor: colors.card, borderColor: colors.border }]}>
             {/* Language Selector */}
-            <View style={styles.settingItem}>
+            <View style={[styles.settingItem, { borderBottomColor: colors.divider }]}>
               <View style={styles.settingLeft}>
-                <Ionicons name="language" size={20} color="#007AFF" />
-                <Text style={styles.settingLabel}>{t('common.language')}</Text>
+                <Ionicons name="language" size={20} color={colors.primary} />
+                <Text style={[styles.settingLabel, { color: colors.text }]}>{t('common.language')}</Text>
               </View>
               <LanguageSelector 
                 buttonStyle={styles.languageSelectorButton}
@@ -261,42 +274,44 @@ export default function ProfileScreen() {
               />
             </View>
             
-            <View style={styles.settingItem}>
+            <View style={[styles.settingItem, { borderBottomColor: colors.divider }]}>
               <View style={styles.settingLeft}>
-                <Ionicons name="notifications" size={20} color="#007AFF" />
-                <Text style={styles.settingLabel}>{t('profile.settings.notifications')}</Text>
+                <Ionicons name="notifications" size={20} color={colors.primary} />
+                <Text style={[styles.settingLabel, { color: colors.text }]}>{t('profile.settings.notifications')}</Text>
               </View>
               <Switch
                 value={notifications}
                 onValueChange={setNotifications}
-                trackColor={{ false: '#f0f0f0', true: '#007AFF' }}
-                thumbColor="white"
+                trackColor={{ false: colors.toggleInactive, true: colors.toggleActive }}
+                thumbColor={colors.toggleThumb}
               />
             </View>
             
-            <View style={styles.settingItem}>
+            <View style={[styles.settingItem, { borderBottomColor: colors.divider }]}>
               <View style={styles.settingLeft}>
-                <Ionicons name="color-palette" size={20} color="#007AFF" />
-                <Text style={styles.settingLabel}>{t('profile.settings.colorPalette')}</Text>
+                <Ionicons name="color-palette" size={20} color={colors.primary} />
+                <Text style={[styles.settingLabel, { color: colors.text }]}>
+                  {t('profile.settings.colorPalette')}
+                </Text>
               </View>
               <Switch
-                value={colorPalette}
-                onValueChange={setColorPalette}
-                trackColor={{ false: '#f0f0f0', true: '#007AFF' }}
-                thumbColor="white"
+                value={isDark}
+                onValueChange={toggleTheme}
+                trackColor={{ false: colors.toggleInactive, true: colors.toggleActive }}
+                thumbColor={colors.toggleThumb}
               />
             </View>
             
-            <View style={styles.settingItem}>
+            <View style={[styles.settingItem, { borderBottomColor: colors.divider }]}>
               <View style={styles.settingLeft}>
-                <Ionicons name="phone-portrait" size={20} color="#007AFF" />
-                <Text style={styles.settingLabel}>{t('profile.settings.hapticFeedback')}</Text>
+                <Ionicons name="phone-portrait" size={20} color={colors.primary} />
+                <Text style={[styles.settingLabel, { color: colors.text }]}>{t('profile.settings.hapticFeedback')}</Text>
               </View>
               <Switch
                 value={hapticFeedback}
                 onValueChange={setHapticFeedback}
-                trackColor={{ false: '#f0f0f0', true: '#007AFF' }}
-                thumbColor="white"
+                trackColor={{ false: colors.toggleInactive, true: colors.toggleActive }}
+                thumbColor={colors.toggleThumb}
               />
             </View>
           </View>
@@ -305,45 +320,52 @@ export default function ProfileScreen() {
         {/* Menu Sections */}
         {menuItems.map((section, sectionIndex) => (
           <View key={sectionIndex} style={styles.section}>
-            <Text style={styles.sectionTitle}>{section.title}</Text>
-            <View style={styles.menuGroup}>
+            <Text style={[styles.sectionTitle, { color: colors.text }]}>{section.title}</Text>
+            <View style={[styles.menuGroup, { backgroundColor: colors.card, borderColor: colors.border }]}>
               {section.items.map((item, itemIndex) => {
                 // Define icon colors based on the item
                 const getIconColor = (label: string) => {
                   switch (label) {
                     case 'Default Game Type':
                     case 'Stack Size':
-                      return '#22c55e'; // Green
+                      return colors.success; // Green
                     case 'Analysis Speed':
-                      return '#22c55e'; // Green
+                      return colors.success; // Green
                     case 'Difficulty Level':
-                      return '#22c55e'; // Green
+                      return colors.success; // Green
                     case 'Session Length':
-                      return '#22c55e'; // Green
+                      return colors.success; // Green
                     case 'Focus Areas':
-                      return '#22c55e'; // Green
+                      return colors.success; // Green
                     case 'Export Hand History':
                     case 'Clear Cache':
                     case 'Privacy Policy':
-                      return '#22c55e'; // Green
+                      return colors.success; // Green
                     default:
-                      return '#666';
+                      return colors.textSecondary;
                   }
                 };
 
                 const iconColor = getIconColor(item.label);
 
                 return (
-                  <TouchableOpacity key={itemIndex} style={styles.menuItem}>
+                  <TouchableOpacity 
+                    key={itemIndex} 
+                    style={[
+                      styles.menuItem, 
+                      { borderBottomColor: colors.divider },
+                      itemIndex === section.items.length - 1 && { borderBottomWidth: 0 }
+                    ]}
+                  >
                     <View style={styles.menuLeft}>
-                      <View style={[styles.iconBackground, { backgroundColor: `${iconColor}15` }]}>
+                      <View style={[styles.iconBackground, { backgroundColor: iconColor + '15' }]}>
                         <Ionicons name={item.icon as any} size={18} color={iconColor} />
                       </View>
-                      <Text style={styles.menuLabel}>{item.label}</Text>
+                      <Text style={[styles.menuLabel, { color: colors.text }]}>{item.label}</Text>
                     </View>
                     <View style={styles.menuRight}>
-                      {item.value && <Text style={styles.menuValue}>{item.value}</Text>}
-                      <Ionicons name="chevron-forward" size={16} color="#666" />
+                      {item.value && <Text style={[styles.menuValue, { color: colors.textSecondary }]}>{item.value}</Text>}
+                      <Ionicons name="chevron-forward" size={16} color={colors.textSecondary} />
                     </View>
                   </TouchableOpacity>
                 );
@@ -354,54 +376,54 @@ export default function ProfileScreen() {
 
         {/* Subscription Info */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>{t('profile.subscription')}</Text>
-          <View style={styles.subscriptionCard}>
+          <Text style={[styles.sectionTitle, { color: colors.text }]}>{t('profile.subscription')}</Text>
+          <View style={[styles.subscriptionCard, { backgroundColor: colors.card, borderColor: colors.border }]}>
             <View style={styles.subscriptionHeader}>
-              <Text style={styles.subscriptionTitle}>{t('profile.subscriptionInfo.title')}</Text>
-              <View style={styles.subscriptionBadge}>
+              <Text style={[styles.subscriptionTitle, { color: colors.text }]}>{t('profile.subscriptionInfo.title')}</Text>
+              <View style={[styles.subscriptionBadge, { backgroundColor: colors.success }]}>
                 <Text style={styles.subscriptionBadgeText}>{t('profile.subscriptionInfo.status')}</Text>
               </View>
             </View>
-            <Text style={styles.subscriptionDescription}>
+            <Text style={[styles.subscriptionDescription, { color: colors.textSecondary }]}>
               {t('profile.subscriptionInfo.description')}
             </Text>
-            <Text style={styles.subscriptionRenewal}>
+            <Text style={[styles.subscriptionRenewal, { color: colors.textTertiary }]}>
               {t('profile.subscriptionInfo.renewsOn')} March 15, 2024
             </Text>
-            <TouchableOpacity style={styles.manageButton}>
-              <Text style={styles.manageButtonText}>{t('profile.subscriptionInfo.manageSubscription')}</Text>
+            <TouchableOpacity style={[styles.manageButton, { backgroundColor: colors.primary }]}>
+              <Text style={[styles.manageButtonText, { color: 'white' }]}>{t('profile.subscriptionInfo.manageSubscription')}</Text>
             </TouchableOpacity>
           </View>
         </View>
 
         {/* Support & About */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>{t('profile.supportAbout')}</Text>
-          <View style={styles.menuGroup}>
-            <TouchableOpacity style={styles.menuItem}>
+          <Text style={[styles.sectionTitle, { color: colors.text }]}>{t('profile.supportAbout')}</Text>
+          <View style={[styles.menuGroup, { backgroundColor: colors.card, borderColor: colors.border }]}>
+            <TouchableOpacity style={[styles.menuItem, { borderBottomColor: colors.divider }]}>
               <View style={styles.menuLeft}>
-                <Ionicons name="help-circle" size={20} color="#666" />
-                <Text style={styles.menuLabel}>{t('profile.settings.helpFAQ')}</Text>
+                <Ionicons name="help-circle" size={20} color={colors.textSecondary} />
+                <Text style={[styles.menuLabel, { color: colors.text }]}>{t('profile.settings.helpFAQ')}</Text>
               </View>
-              <Ionicons name="chevron-forward" size={16} color="#666" />
+              <Ionicons name="chevron-forward" size={16} color={colors.textSecondary} />
+            </TouchableOpacity>
+            
+            <TouchableOpacity style={[styles.menuItem, { borderBottomColor: colors.divider }]}>
+              <View style={styles.menuLeft}>
+                <Ionicons name="mail" size={20} color={colors.textSecondary} />
+                <Text style={[styles.menuLabel, { color: colors.text }]}>{t('profile.settings.contactSupport')}</Text>
+              </View>
+              <Ionicons name="chevron-forward" size={16} color={colors.textSecondary} />
             </TouchableOpacity>
             
             <TouchableOpacity style={styles.menuItem}>
               <View style={styles.menuLeft}>
-                <Ionicons name="mail" size={20} color="#666" />
-                <Text style={styles.menuLabel}>{t('profile.settings.contactSupport')}</Text>
-              </View>
-              <Ionicons name="chevron-forward" size={16} color="#666" />
-            </TouchableOpacity>
-            
-            <TouchableOpacity style={styles.menuItem}>
-              <View style={styles.menuLeft}>
-                <Ionicons name="information-circle" size={20} color="#666" />
-                <Text style={styles.menuLabel}>{t('profile.settings.about')}</Text>
+                <Ionicons name="information-circle" size={20} color={colors.textSecondary} />
+                <Text style={[styles.menuLabel, { color: colors.text }]}>{t('profile.settings.about')}</Text>
               </View>
               <View style={styles.menuRight}>
-                <Text style={styles.menuValue}>v1.0.0</Text>
-                <Ionicons name="chevron-forward" size={16} color="#666" />
+                <Text style={[styles.menuValue, { color: colors.textSecondary }]}>v1.0.0</Text>
+                <Ionicons name="chevron-forward" size={16} color={colors.textSecondary} />
               </View>
             </TouchableOpacity>
           </View>
@@ -410,10 +432,10 @@ export default function ProfileScreen() {
         {/* Sign Out */}
         <View style={styles.section_sign_out}>
           <TouchableOpacity 
-            style={styles.signOutButton}
+            style={[styles.signOutButton, { backgroundColor: colors.error }]}
             onPress={handleSignOut}
           >
-            <Text style={styles.signOutText}>{t('profile.signOut')}</Text>
+            <Text style={[styles.signOutText, { color: 'white' }]}>{t('profile.signOut')}</Text>
           </TouchableOpacity>
         </View>
       </ScrollView>

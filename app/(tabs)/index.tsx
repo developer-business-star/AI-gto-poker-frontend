@@ -2,6 +2,7 @@ import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import { useGame } from '@/contexts/GameContext';
 import { useAuth } from '@/contexts/AuthContext';
+import { useTheme } from '@/contexts/ThemeContext';
 import { AntDesign, FontAwesome5, Ionicons, MaterialIcons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import React, { useState, useEffect } from 'react';
@@ -62,6 +63,7 @@ export default function HomeScreen() {
   const router = useRouter();
   const { selectedFormat, setSelectedFormat } = useGame();
   const { user, token } = useAuth();
+  const { colors, isDark } = useTheme();
   const [isSelecting, setIsSelecting] = useState(false);
   const [isNavigating, setIsNavigating] = useState(false);
   const [analysisStats, setAnalysisStats] = useState<{
@@ -749,9 +751,9 @@ export default function HomeScreen() {
           </View>
           
           <View style={styles.gameModeContent}>
-            <Text style={styles.gameModeTitle}>{mode.title}</Text>
-            <Text style={styles.gameModeSubtitle}>{mode.subtitle}</Text>
-            <Text style={styles.gameModeDescription}>{mode.description}</Text>
+            <Text style={[styles.gameModeTitle, { color: 'white' }]}>{mode.title}</Text>
+            <Text style={[styles.gameModeSubtitle, { color: 'rgba(255,255,255,0.9)' }]}>{mode.subtitle}</Text>
+            <Text style={[styles.gameModeDescription, { color: 'rgba(255,255,255,0.8)' }]}>{mode.description}</Text>
           </View>
 
           {/* Selection Indicator */}
@@ -765,7 +767,7 @@ export default function HomeScreen() {
           {/* Navigate to Solver Indicator */}
           <View style={styles.navigateIndicator}>
             <Ionicons name="school" size={16} color="white" />
-            <Text style={styles.navigateText}>To Solver</Text>
+            <Text style={[styles.navigateText, { color: 'white' }]}>To Solver</Text>
           </View>
         </View>
       </TouchableOpacity>
@@ -817,14 +819,14 @@ export default function HomeScreen() {
   };
 
   const RecentSessionItem = ({ session }: { session: Session }) => (
-    <View style={styles.sessionItem}>
+    <View style={[styles.sessionItem, { borderBottomColor: colors.divider }]}>
       <View style={styles.sessionLeft}>
-        <View style={styles.sessionIcon}>
-          <MaterialIcons name="casino" size={16} color="#6b7280" />
+        <View style={[styles.sessionIcon, { backgroundColor: colors.surface }]}>
+          <MaterialIcons name="casino" size={16} color={colors.textSecondary} />
         </View>
         <View>
-          <Text style={styles.sessionGameType}>{session.gameType}</Text>
-          <Text style={styles.sessionGamePot}>{session.gamePot} • {session.date}</Text>
+          <Text style={[styles.sessionGameType, { color: colors.text }]}>{session.gameType}</Text>
+          <Text style={[styles.sessionGamePot, { color: colors.textSecondary }]}>{session.gamePot} • {session.date}</Text>
         </View>
       </View>
       <View style={styles.sessionRight}>
@@ -839,17 +841,17 @@ export default function HomeScreen() {
   );
 
   return (
-    <ThemedView style={styles.container}>
+    <ThemedView style={[styles.container, { backgroundColor: colors.background }]}>
       <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
         {/* Header */}
-        <View style={styles.header}>
+        <View style={[styles.header ]}>
           <View style={styles.headerTop}>
             <View>
-              <ThemedText style={styles.title}>Welcome To Here 🤖</ThemedText>
-              <ThemedText style={styles.subtitle}>Ready to improve your game?</ThemedText>
+              <ThemedText style={[styles.title, { color: colors.text }]}>Welcome To Here 🤖</ThemedText>
+              <ThemedText style={[styles.subtitle, { color: colors.textSecondary }]}>Ready to improve your game?</ThemedText>
             </View>
-            <TouchableOpacity style={styles.solverButton} onPress={() => router.push('/(tabs)/camera')}>
-              <MaterialIcons name="center-focus-strong" size={24} color="#10b981" />
+            <TouchableOpacity style={[styles.solverButton, { backgroundColor: colors.primary }]} onPress={() => router.push('/(tabs)/camera')}>
+              <MaterialIcons name="center-focus-strong" size={24} color="white" />
             </TouchableOpacity>
           </View>
         </View>
@@ -858,35 +860,35 @@ export default function HomeScreen() {
         <CurrentSelectionBanner />
 
         {/* Quick Stats */}
-        <View style={styles.statsContainer}>
-          <View style={styles.statCard}>
-            <Ionicons name="documents" size={20} color="#6b7280" />
-            <Text style={styles.statValue}>
+        <View style={[styles.statsContainer, { shadowColor: colors.shadow, borderColor: colors.border }]}>
+          <View style={[styles.statCard, { backgroundColor: colors.surface, borderColor: colors.divider }]}>
+            <Ionicons name="documents" size={20} color={colors.textSecondary} />
+            <Text style={[styles.statValue, { color: colors.text }]}>
               {isLoadingFormatStats ? '···' : getCurrentFormatStats().handsAnalyzed}
             </Text>
-            <Text style={styles.statLabel}>Hands Analyzed</Text>
+            <Text style={[styles.statLabel, { color: colors.textSecondary }]}>Hands Analyzed</Text>
           </View>
-          <View style={styles.statCard}>
-            <MaterialIcons name="gps-fixed" size={20} color="#6b7280" />
-            <Text style={styles.statValue}>
+          <View style={[styles.statCard, { backgroundColor: colors.surface, borderColor: colors.divider }]}>
+            <MaterialIcons name="gps-fixed" size={20} color={colors.textSecondary} />
+            <Text style={[styles.statValue, { color: colors.text }]}>
               {isLoadingFormatStats ? '···' : `${Math.round(getCurrentFormatStats().accuracyRate)}%`}
             </Text>
-            <Text style={styles.statLabel}>Accuracy Rate</Text>
+            <Text style={[styles.statLabel, { color: colors.textSecondary }]}>Accuracy Rate</Text>
           </View>
-          <View style={styles.statCard}>
-            <Ionicons name="time" size={20} color="#6b7280" />
-            <Text style={styles.statValue}>
+          <View style={[styles.statCard, { backgroundColor: colors.surface, borderColor: colors.divider }]}>
+            <Ionicons name="time" size={20} color={colors.textSecondary} />
+            <Text style={[styles.statValue, { color: colors.text }]}>
               {isLoadingFormatStats ? '···' : getCurrentFormatStats().studyTime}
             </Text>
-            <Text style={styles.statLabel}>Study Time</Text>
+            <Text style={[styles.statLabel, { color: colors.textSecondary }]}>Study Time</Text>
           </View>
         </View>
 
         {/* Game Modes Selection */}
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
-            <ThemedText style={styles.sectionTitle}>Choose Game Format</ThemedText>
-            <Text style={styles.sectionSubtitle}>Select a format to start GTO analysis</Text>
+            <ThemedText style={[styles.sectionTitle, { color: colors.text }]}>Choose Game Format</ThemedText>
+            <Text style={[styles.sectionSubtitle, { color: colors.textSecondary }]}>Select a format to start GTO analysis</Text>
           </View>
           <View style={styles.gameModeContainer}>
             {gameModesData.map((mode) => (
@@ -897,8 +899,8 @@ export default function HomeScreen() {
 
         {/* Recent Sessions */}
         <View style={styles.section}>
-          <ThemedText style={styles.sectionTitle}>Recent Sessions</ThemedText>
-          <View style={styles.sessionsList}>
+          <ThemedText style={[styles.sectionTitle, { color: colors.text }]}>Recent Sessions</ThemedText>
+          <View style={[styles.sessionsList, { backgroundColor: colors.card, borderColor: colors.border }]}>
             {recentSessions.map((session) => (
               <RecentSessionItem key={session.id} session={session} />
             ))}
@@ -907,20 +909,20 @@ export default function HomeScreen() {
 
         {/* Quick Tools */}
         <View style={styles.section_quick}>
-          <ThemedText style={styles.sectionTitle}>Quick Tools</ThemedText>
+          <ThemedText style={[styles.sectionTitle, { color: colors.text }]}>Quick Tools</ThemedText>
           <View style={styles.toolsGrid}>
-            <TouchableOpacity style={styles.toolCard} onPress={handleDailyCheckInPress}>
+            <TouchableOpacity style={[styles.toolCard, { backgroundColor: colors.card, borderColor: colors.border }]} onPress={handleDailyCheckInPress}>
               <View style={styles.toolIconContainer}>
                 <View style={[styles.iconBackground, { backgroundColor: '#dbeafe' }]}>
                   <Ionicons name="calendar" size={28} color="#2563eb" />
                 </View>
               </View>
-              <Text style={styles.toolTitle}>Daily Check-in</Text>
-              <Text style={styles.toolSubtitle}>
+              <Text style={[styles.toolTitle, { color: colors.text }]}>Daily Check-in</Text>
+              <Text style={[styles.toolSubtitle, { color: colors.textSecondary }]}>
                 {hasCheckedInToday ? 'Already checked in!' : 'Claim today\'s reward'}
               </Text>
               <View style={styles.rewardContainer}>
-                <Text style={styles.rewardText}>
+                <Text style={[styles.rewardText, { color: colors.textSecondary }]}>
                   {hasCheckedInToday ? 'See you tomorrow!' : '+5 - 25 quota'}
                 </Text>
                 <View style={styles.progressDots}>
@@ -933,20 +935,20 @@ export default function HomeScreen() {
               </View>
             </TouchableOpacity>
             
-            <TouchableOpacity style={styles.toolCard} onPress={handleHandHistoryPress}>
+            <TouchableOpacity style={[styles.toolCard, { backgroundColor: colors.card, borderColor: colors.border }]} onPress={handleHandHistoryPress}>
               <View style={styles.toolIconContainer}>
                 <View style={styles.iconBackground}>
                   <Ionicons name="pulse" size={28} color="#f59e0b" />
                 </View>
               </View>
-              <Text style={styles.toolTitle}>Hand History</Text>
-              <Text style={styles.toolSubtitle}>Review queue: 1 hands</Text>
-              <TouchableOpacity style={styles.toolActionButton}>
-                <Text style={styles.toolActionText}>Start review +20 pts</Text>
+              <Text style={[styles.toolTitle, { color: colors.text }]}>Hand History</Text>
+              <Text style={[styles.toolSubtitle, { color: colors.textSecondary }]}>Review queue: 1 hands</Text>
+              <TouchableOpacity style={[styles.toolActionButton, { backgroundColor: colors.primary, borderColor: colors.primary }]}>
+                <Text style={[styles.toolActionText, { color: 'white' }]}>Start review +20 pts</Text>
               </TouchableOpacity>
             </TouchableOpacity>
             
-              <TouchableOpacity style={styles.toolCard} onPress={handleStreaksGoalsPress}>
+              <TouchableOpacity style={[styles.toolCard, { backgroundColor: colors.card, borderColor: colors.border }]} onPress={handleStreaksGoalsPress}>
                 <View style={styles.toolIconContainer}>
                   <View style={styles.progressCircle}>
                     <Text style={styles.progressText}>
@@ -954,22 +956,22 @@ export default function HomeScreen() {
                     </Text>
                   </View>
                 </View>
-                <Text style={styles.toolTitle}>Streaks & Goals</Text>
-                <Text style={styles.toolSubtitle}>Keep your run going</Text>
-                <TouchableOpacity style={styles.toolActionButton}>
-                  <Text style={styles.toolActionText}>View progress</Text>
+                <Text style={[styles.toolTitle, { color: colors.text }]}>Streaks & Goals</Text>
+                <Text style={[styles.toolSubtitle, { color: colors.textSecondary }]}>Keep your run going</Text>
+                <TouchableOpacity style={[styles.toolActionButton, { backgroundColor: colors.primary, borderColor: colors.primary }]}>
+                  <Text style={[styles.toolActionText, { color: 'white' }]}>View progress</Text>
                 </TouchableOpacity>
               </TouchableOpacity>
             
-            <TouchableOpacity style={styles.toolCard} onPress={handleQuizModalOpen}>
+            <TouchableOpacity style={[styles.toolCard, { backgroundColor: colors.card, borderColor: colors.border }]} onPress={handleQuizModalOpen}>
               <View style={styles.toolIconContainer}>
                 <View style={[styles.iconBackground, { backgroundColor: '#dcfce7' }]}>
                   <Ionicons name="help-circle" size={28} color="#16a34a" />
                 </View>
               </View>
-              <Text style={styles.toolTitle}>Solve Problems</Text>
-              <Text style={styles.toolSubtitle}>Daily quiz challenge</Text>
-              <Text style={styles.rewardText}>+15 pts for 80%+ score</Text>
+              <Text style={[styles.toolTitle, { color: colors.text }]}>Solve Problems</Text>
+              <Text style={[styles.toolSubtitle, { color: colors.textSecondary }]}>Daily quiz challenge</Text>
+              <Text style={[styles.rewardText, { color: colors.textSecondary }]}>+15 pts for 80%+ score</Text>
             </TouchableOpacity>
           </View>
         </View>

@@ -9,6 +9,7 @@ import 'react-native-reanimated';
 import { StyledAlertProvider } from '@/components/StyledAlert';
 import { GameProvider } from '@/contexts/GameContext';
 import { AuthProvider } from '@/contexts/AuthContext';
+import { ThemeProvider as CustomThemeProvider } from '@/contexts/ThemeContext';
 import { useColorScheme } from '@/hooks/useColorScheme';
 // Initialize i18n
 import '@/i18n';
@@ -33,19 +34,21 @@ export default function RootLayout() {
   }
 
   return (
-    <StyledAlertProvider>
-      <AuthProvider>
-        <GameProvider>
-          <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-            <Stack>
-              <Stack.Screen name="(auth)" options={{ headerShown: false }} />
-              <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-              <Stack.Screen name="+not-found" />
-            </Stack>
-            <StatusBar style="auto" />
-          </ThemeProvider>
-        </GameProvider>
-      </AuthProvider>
-    </StyledAlertProvider>
+    <CustomThemeProvider>
+      <StyledAlertProvider>
+        <AuthProvider>
+          <GameProvider>
+            <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+              <Stack>
+                <Stack.Screen name="(auth)" options={{ headerShown: false }} />
+                <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+                <Stack.Screen name="+not-found" />
+              </Stack>
+              <StatusBar style="auto" />
+            </ThemeProvider>
+          </GameProvider>
+        </AuthProvider>
+      </StyledAlertProvider>
+    </CustomThemeProvider>
   );
 }

@@ -4,6 +4,7 @@ import { Ionicons } from '@expo/vector-icons';
 import React, { useState, useEffect } from 'react';
 import { ScrollView, StyleSheet, Text, TouchableOpacity, View, ActivityIndicator, Alert, Platform, Clipboard } from 'react-native';
 import { useAuth } from '@/contexts/AuthContext';
+import { useTheme } from '@/contexts/ThemeContext';
 import { API_CONFIG } from '@/config/api';
 import * as FileSystem from 'expo-file-system';
 import * as Sharing from 'expo-sharing';
@@ -64,6 +65,7 @@ interface ComprehensiveStats {
 
 export default function StatsScreen() {
   const { user, token, isLoading: authLoading } = useAuth();
+  const { colors, isDark } = useTheme();
   const [userSessionData, setUserSessionData] = useState<UserSessionData | null>(null);
   const [comprehensiveStats, setComprehensiveStats] = useState<ComprehensiveStats | null>(null);
   const [loading, setLoading] = useState(true);
@@ -619,7 +621,7 @@ export default function StatsScreen() {
     };
 
     return (
-      <View style={styles.statCard}>
+      <View style={[styles.statCard, { backgroundColor: colors.card, shadowColor: colors.shadow }]}>
         <View style={styles.statHeader}>
           <View style={[styles.iconContainer, { backgroundColor: `${stat.color}15` }]}>
             <Ionicons 
@@ -628,10 +630,10 @@ export default function StatsScreen() {
               color={stat.color} 
             />
           </View>
-          <Text style={styles.statTitle}>{stat.title}</Text>
+          <Text style={[styles.statTitle, { color: colors.text }]}>{stat.title}</Text>
         </View>
         <Text style={[styles.statValue, { color: stat.color }]}>{stat.value}</Text>
-        <Text style={styles.statSubtitle}>{stat.subtitle}</Text>
+        <Text style={[styles.statSubtitle, { color: colors.textSecondary }]}>{stat.subtitle}</Text>
       </View>
     );
   };
@@ -639,8 +641,8 @@ export default function StatsScreen() {
   const PositionBar = ({ position, accuracy, hands, color }: any) => (
     <View style={styles.positionRow}>
       <View style={styles.positionInfo}>
-        <Text style={styles.positionName}>{position}</Text>
-        <Text style={styles.positionHands}>{hands} hands</Text>
+        <Text style={[styles.positionName, { color: colors.text }]}>{position}</Text>
+        <Text style={[styles.positionHands, { color: colors.textSecondary }]}>{hands} hands</Text>
       </View>
       <View style={styles.positionBar}>
         <View 
@@ -689,18 +691,18 @@ export default function StatsScreen() {
   }
 
   return (
-    <ThemedView style={styles.container}>
+    <ThemedView style={[styles.container, { backgroundColor: colors.background }]}>
       <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
         {/* Header */}
         <View style={styles.header}>
-          <ThemedText style={styles.title}>Performance Analytics</ThemedText>
-          <ThemedText style={styles.subtitle}>Track your GTO progress</ThemedText>
+          <ThemedText style={[styles.title, { color: colors.text }]}>Performance Analytics</ThemedText>
+          <ThemedText style={[styles.subtitle, { color: colors.textSecondary }]}>Track your GTO progress</ThemedText>
         </View>
 
         {/* Overall Stats Grid */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Overview</Text>
-          <View style={styles.statsGrid}>
+          <Text style={[styles.sectionTitle, { color: colors.text }]}>Overview</Text>
+          <View style={[styles.statsGrid, { borderColor: colors.border }]}>
             {overallStats.map((stat, index) => (
               <StatCardComponent key={index} stat={stat} />
             ))}
@@ -709,8 +711,8 @@ export default function StatsScreen() {
 
         {/* Position Analysis */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Position Analysis</Text>
-          <View style={styles.positionChart}>
+          <Text style={[styles.sectionTitle, { color: colors.text }]}>Position Analysis</Text>
+          <View style={[styles.positionChart, { backgroundColor: colors.card, borderColor: colors.border }]}>
             {positionStats.map((position, index) => (
               <PositionBar
                 key={index}
@@ -726,29 +728,29 @@ export default function StatsScreen() {
         {/* Accuracy Trend */}
         <View style={styles.section}>
           <View style={styles.trendHeader}>
-            <Text style={styles.sectionTitle}>Accuracy Trend</Text>
+            <Text style={[styles.sectionTitle, { color: colors.text }]}>Accuracy Trend</Text>
             <View style={styles.trendPeriod}>
-              <Text style={styles.trendPeriodText}>Last 7 days</Text>
+              <Text style={[styles.trendPeriodText, { color: colors.textSecondary }]}>Last 7 days</Text>
             </View>
           </View>
-          <View style={styles.trendChart}>
+          <View style={[styles.trendChart, { backgroundColor: colors.card, borderColor: colors.border }]}>
             <View style={styles.trendContent}>
               {/* Y-axis labels */}
               <View style={styles.yAxisLabels}>
-                <Text style={styles.yAxisLabel}>100%</Text>
-                <Text style={styles.yAxisLabel}>75%</Text>
-                <Text style={styles.yAxisLabel}>50%</Text>
-                <Text style={styles.yAxisLabel}>25%</Text>
+                <Text style={[styles.yAxisLabel, { color: colors.textSecondary }]}>100%</Text>
+                <Text style={[styles.yAxisLabel, { color: colors.textSecondary }]}>75%</Text>
+                <Text style={[styles.yAxisLabel, { color: colors.textSecondary }]}>50%</Text>
+                <Text style={[styles.yAxisLabel, { color: colors.textSecondary }]}>25%</Text>
               </View>
               
               {/* Chart area */}
               <View style={styles.chartArea}>
                 {/* Grid lines */}
                 <View style={styles.gridLines}>
-                  <View style={styles.gridLine} />
-                  <View style={styles.gridLine} />
-                  <View style={styles.gridLine} />
-                  <View style={styles.gridLine} />
+                  <View style={[styles.gridLine, { backgroundColor: colors.divider }]} />
+                  <View style={[styles.gridLine, { backgroundColor: colors.divider }]} />
+                  <View style={[styles.gridLine, { backgroundColor: colors.divider }]} />
+                  <View style={[styles.gridLine, { backgroundColor: colors.divider }]} />
                 </View>
                 
                 {/* Data points with connecting line */}
@@ -763,7 +765,7 @@ export default function StatsScreen() {
                               backgroundColor: '#d1d5db',
                               opacity: 0.3 
                             }]} />
-                            <Text style={styles.dataValue}>-</Text>
+                            <Text style={[styles.dataValue, { color: colors.textSecondary }]}>-</Text>
                           </View>
                         );
                       }
@@ -778,7 +780,7 @@ export default function StatsScreen() {
                             bottom: bottomPosition as any, 
                             backgroundColor: pointColor 
                           }]} />
-                          <Text style={styles.dataValue}>{point.accuracy}%</Text>
+                          <Text style={[styles.dataValue, { color: colors.text }]}>{point.accuracy}%</Text>
                         </View>
                       );
                     })
@@ -796,7 +798,7 @@ export default function StatsScreen() {
                           bottom: point.bottom as any, 
                           backgroundColor: point.color 
                         }]} />
-                        <Text style={styles.dataValue}>{point.accuracy}%</Text>
+                        <Text style={[styles.dataValue, { color: colors.text }]}>{point.accuracy}%</Text>
                       </View>
                     ))
                   }
@@ -806,22 +808,22 @@ export default function StatsScreen() {
             
             {/* X-axis labels */}
             <View style={styles.trendLabels}>
-              <Text style={styles.trendLabel}>Mon</Text>
-              <Text style={styles.trendLabel}>Tue</Text>
-              <Text style={styles.trendLabel}>Wed</Text>
-              <Text style={styles.trendLabel}>Thu</Text>
-              <Text style={styles.trendLabel}>Fri</Text>
+              <Text style={[styles.trendLabel, { color: colors.textSecondary }]}>Mon</Text>
+              <Text style={[styles.trendLabel, { color: colors.textSecondary }]}>Tue</Text>
+              <Text style={[styles.trendLabel, { color: colors.textSecondary }]}>Wed</Text>
+              <Text style={[styles.trendLabel, { color: colors.textSecondary }]}>Thu</Text>
+              <Text style={[styles.trendLabel, { color: colors.textSecondary }]}>Fri</Text>
             </View>
             
             {/* Summary stats */}
             <View style={styles.trendSummary}>
               <View style={styles.summaryItem}>
-                <Ionicons name="trending-up" size={16} color="#22c55e" />
-                <Text style={styles.summaryText}>+7% this week</Text>
+                <Ionicons name="trending-up" size={16} color={colors.success} />
+                <Text style={[styles.summaryText, { color: colors.textSecondary }]}>+7% this week</Text>
               </View>
               <View style={styles.summaryItem}>
-                <Ionicons name="calendar" size={16} color="#6b7280" />
-                <Text style={styles.summaryText}>5 sessions</Text>
+                <Ionicons name="calendar" size={16} color={colors.textSecondary} />
+                <Text style={[styles.summaryText, { color: colors.textSecondary }]}>5 sessions</Text>
               </View>
             </View>
           </View>
@@ -830,30 +832,30 @@ export default function StatsScreen() {
         {/* Recent Sessions */}
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>Recent Sessions</Text>
+            <Text style={[styles.sectionTitle, { color: colors.text }]}>Recent Sessions</Text>
             {recentSessions.length === 0 && !error && (
-              <Text style={styles.fallbackNote}>Sample data (API unavailable)</Text>
+              <Text style={[styles.fallbackNote, { color: colors.textSecondary }]}>Sample data (API unavailable)</Text>
             )}
           </View>
-          <View style={styles.sessionsList}>
+          <View style={[styles.sessionsList, { backgroundColor: colors.card, borderColor: colors.border }]}>
             {comprehensiveStats?.recentSessions && comprehensiveStats.recentSessions.length > 0 ? (
               comprehensiveStats.recentSessions.map((session, index) => (
-                <View key={index} style={styles.sessionItem}>
+                <View key={index} style={[styles.sessionItem, { borderBottomColor: colors.divider }]}>
                   <View style={styles.sessionLeft}>
-                    <Text style={styles.sessionGame}>{session.gameType}</Text>
-                    <Text style={styles.sessionDetails}>
+                    <Text style={[styles.sessionGame, { color: colors.text }]}>{session.gameType}</Text>
+                    <Text style={[styles.sessionDetails, { color: colors.textSecondary }]}>
                       {session.recommendedAction} • {session.confidence}% confidence
                     </Text>
                   </View>
                   <View style={styles.sessionRight}>
                     <Text style={[
                       styles.sessionResult,
-                      { color: session.confidence >= 85 ? '#22c55e' : 
-                               session.confidence >= 70 ? '#f59e0b' : '#ef4444' }
+                      { color: session.confidence >= 85 ? colors.success : 
+                               session.confidence >= 70 ? colors.warning : colors.error }
                     ]}>
                       {session.result}
                     </Text>
-                    <Text style={styles.sessionDate}>{formatDate(session.date)}</Text>
+                    <Text style={[styles.sessionDate, { color: colors.textTertiary }]}>{formatDate(session.date)}</Text>
                   </View>
                 </View>
               ))
@@ -892,23 +894,23 @@ export default function StatsScreen() {
 
         {/* Quick Actions */}
         <View style={styles.section_quick}>
-          <Text style={styles.sectionTitle}>Quick Actions</Text>
-          <View style={styles.actionButtons}>
-            <TouchableOpacity style={styles.actionButton} onPress={handleExportData}>
-              <Ionicons name="download" size={20} color="#007AFF" />
-              <Text style={styles.actionText}>Export Data</Text>
+          <Text style={[styles.sectionTitle, { color: colors.text }]}>Quick Actions</Text>
+          <View style={[styles.actionButtons, { borderColor: colors.border }]}>
+            <TouchableOpacity style={[styles.actionButton, { backgroundColor: colors.primary }]} onPress={handleExportData}>
+              <Ionicons name="download" size={20} color="white" />
+              <Text style={[styles.actionText, { color: 'white' }]}>Export Data</Text>
             </TouchableOpacity>
             <TouchableOpacity 
-              style={[styles.actionButton, resetting && styles.actionButtonDisabled]} 
+              style={[styles.actionButton, { backgroundColor: colors.error }, resetting && styles.actionButtonDisabled]} 
               onPress={handleResetStats}
               disabled={resetting}
             >
               {resetting ? (
-                <ActivityIndicator size="small" color="#007AFF" />
+                <ActivityIndicator size="small" color="white" />
               ) : (
-                <Ionicons name="refresh" size={20} color="#007AFF" />
+                <Ionicons name="refresh" size={20} color="white" />
               )}
-              <Text style={[styles.actionText, resetting && styles.actionTextDisabled]}>
+              <Text style={[styles.actionText, { color: 'white' }, resetting && styles.actionTextDisabled]}>
                 {resetting ? 'Resetting...' : 'Reset Stats'}
               </Text>
             </TouchableOpacity>

@@ -1,6 +1,7 @@
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import { useGame } from '@/contexts/GameContext';
+import { useTheme } from '@/contexts/ThemeContext';
 import { Ionicons, MaterialIcons } from '@expo/vector-icons';
 import { useLocalSearchParams } from 'expo-router';
 import React, { useEffect, useState } from 'react';
@@ -21,6 +22,7 @@ interface HandData {
 export default function TrainingScreen() {
   const params = useLocalSearchParams();
   const { selectedFormat, formatDisplayName } = useGame();
+  const { colors, isDark } = useTheme();
   
   // Prioritize global context over route parameters
   const gameType = selectedFormat;
@@ -136,12 +138,12 @@ export default function TrainingScreen() {
   }, [gameType]);
 
   return (
-    <ThemedView style={styles.container}>
+    <ThemedView style={[styles.container, { backgroundColor: colors.background }]}>
       <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
         {/* Header */}
-        <View style={styles.header}>
+        <View style={[styles.header]}>
           <ThemedText style={[styles.title, { color: gameType === 'cash' ? '#3b82f6' : '#f87171' }]}>{gameFormat} Training</ThemedText>
-          <ThemedText style={styles.subtitle}>
+          <ThemedText style={[styles.subtitle, { color: colors.textSecondary }]}>
             {gameType === 'cash' 
               ? 'Practice deep stack decision making' 
               : 'Master short stack and ICM situations'
@@ -152,61 +154,79 @@ export default function TrainingScreen() {
         {/* Game Info */}
         <View style={[
           styles.gameInfo,
-          { borderColor: gameType === 'cash' ? '#3b82f6' : '#f87171' }
+          { 
+            borderColor: gameType === 'cash' ? '#3b82f6' : '#f87171',
+            backgroundColor: colors.card,
+          }
         ]}>
           <View style={styles.infoGrid}>
             <View style={[
               styles.infoItem,
-              { backgroundColor: gameType === 'cash' ? '#eff6ff' : '#fef2f2' }
+              { 
+                backgroundColor: isDark ? colors.surface : (gameType === 'cash' ? '#eff6ff' : '#fef2f2'),
+                borderColor: colors.divider
+              }
             ]}>
               <Text style={[
                 styles.infoLabel,
                 { color: gameType === 'cash' ? '#1d4ed8' : '#dc2626' }
               ]}>Position:</Text>
-              <Text style={styles.infoValue}>{currentHand.position}</Text>
+              <Text style={[styles.infoValue, { color: colors.text }]}>{currentHand.position}</Text>
             </View>
             <View style={[
               styles.infoItem,
-              { backgroundColor: gameType === 'cash' ? '#eff6ff' : '#fef2f2' }
+              { 
+                backgroundColor: isDark ? colors.surface : (gameType === 'cash' ? '#eff6ff' : '#fef2f2'),
+                borderColor: colors.divider
+              }
             ]}>
               <Text style={[
                 styles.infoLabel,
                 { color: gameType === 'cash' ? '#1d4ed8' : '#dc2626' }
               ]}>Stack:</Text>
-              <Text style={styles.infoValue}>{currentHand.stackSize}bb</Text>
+              <Text style={[styles.infoValue, { color: colors.text }]}>{currentHand.stackSize}bb</Text>
             </View>
             <View style={[
               styles.infoItem,
-              { backgroundColor: gameType === 'cash' ? '#eff6ff' : '#fef2f2' }
+              { 
+                backgroundColor: isDark ? colors.surface : (gameType === 'cash' ? '#eff6ff' : '#fef2f2'),
+                borderColor: colors.divider
+              }
             ]}>
               <Text style={[
                 styles.infoLabel,
                 { color: gameType === 'cash' ? '#1d4ed8' : '#dc2626' }
               ]}>Pot:</Text>
-              <Text style={styles.infoValue}>{currentHand.potSize}bb</Text>
+              <Text style={[styles.infoValue, { color: colors.text }]}>{currentHand.potSize}bb</Text>
             </View>
             {gameType === 'tournaments' && (
               <>
                 <View style={[
                   styles.infoItem,
-                  { backgroundColor: '#fef2f2' }
+                  { 
+                    backgroundColor: isDark ? colors.surface : '#fef2f2',
+                    borderColor: colors.divider
+                  }
                 ]}>
                   <Text style={[
                     styles.infoLabel,
                     { color: '#dc2626' }
                   ]}>Blinds:</Text>
-                  <Text style={styles.infoValue}>{currentHand.blindLevel}</Text>
+                  <Text style={[styles.infoValue, { color: colors.text }]}>{currentHand.blindLevel}</Text>
                 </View>
                 {currentHand.ante && currentHand.ante > 0 && (
                   <View style={[
                     styles.infoItem,
-                    { backgroundColor: '#fef2f2' }
+                    { 
+                      backgroundColor: isDark ? colors.surface : '#fef2f2',
+                      borderColor: colors.divider
+                    }
                   ]}>
                     <Text style={[
                       styles.infoLabel,
                       { color: '#dc2626' }
                     ]}>Ante:</Text>
-                    <Text style={styles.infoValue}>{currentHand.ante}</Text>
+                    <Text style={[styles.infoValue, { color: colors.text }]}>{currentHand.ante}</Text>
                   </View>
                 )}
               </>
@@ -220,16 +240,16 @@ export default function TrainingScreen() {
             styles.gameTypeBadge, 
             { backgroundColor: gameType === 'cash' ? '#1a73e8' : '#ea4335' }
           ]}>
-            <Text style={styles.gameTypeText}>
+            <Text style={[styles.gameTypeText, { color: 'white' }]}>
               {gameType === 'cash' ? '💰 Cash Game' : '🏆 Tournament'}
             </Text>
           </View>
         </View>
 
         {/* Poker Table */}
-        <View style={styles.pokerTable}>
+        <View style={[styles.pokerTable, { backgroundColor: colors.card, borderColor: colors.border }]}>
           <View style={styles.board}>
-            <Text style={styles.boardLabel}>Board</Text>
+            <Text style={[styles.boardLabel, { color: colors.text }]}>Board</Text>
             <View style={styles.boardCards}>
               {currentHand.board.map((card, index) => (
                 <View key={index} style={styles.card}>
@@ -240,7 +260,7 @@ export default function TrainingScreen() {
           </View>
 
           <View style={styles.heroCards}>
-            <Text style={styles.heroLabel}>Your Cards</Text>
+            <Text style={[styles.heroLabel, { color: colors.text }]}>Your Cards</Text>
             <View style={styles.heroCardContainer}>
               {currentHand.heroCards.map((card, index) => (
                 <View key={index} style={[styles.card, styles.heroCard]}>
@@ -252,13 +272,13 @@ export default function TrainingScreen() {
         </View>
 
         {/* Action Description */}
-        <View style={styles.actionSection}>
-          <Text style={styles.actionText}>{currentHand.action}</Text>
-          <Text style={styles.questionText}>What's your optimal decision?</Text>
+        <View style={[styles.actionSection, { backgroundColor: colors.card, borderColor: colors.border }]}>
+          <Text style={[styles.actionText, { color: colors.text }]}>{currentHand.action}</Text>
+          <Text style={[styles.questionText, { color: colors.textSecondary }]}>What's your optimal decision?</Text>
         </View>
 
         {/* Action Buttons */}
-        <View style={styles.actionButtons}>
+        <View style={[styles.actionButtons, { borderColor: colors.border }]}>
           {actions.map((action) => (
             <TouchableOpacity
               key={action.id}
@@ -270,24 +290,24 @@ export default function TrainingScreen() {
               onPress={() => handleActionPress(action.id)}
               disabled={showResult}
             >
-              <Text style={styles.actionButtonText}>{action.label}</Text>
+              <Text style={[styles.actionButtonText, { color: 'white' }]}>{action.label}</Text>
             </TouchableOpacity>
           ))}
         </View>
 
         {/* Result Feedback */}
         {showResult && (
-          <View style={styles.resultSection}>
-            <Text style={styles.resultText}>{getResultMessage()}</Text>
-            <TouchableOpacity style={styles.nextHandButton} onPress={nextHand}>
-              <Text style={styles.nextHandText}>Next Hand</Text>
+          <View style={[styles.resultSection, { backgroundColor: colors.card, borderColor: colors.border }]}>
+            <Text style={[styles.resultText, { color: colors.text }]}>{getResultMessage()}</Text>
+            <TouchableOpacity style={[styles.nextHandButton, { backgroundColor: colors.primary }]} onPress={nextHand}>
+              <Text style={[styles.nextHandText, { color: 'white' }]}>Next Hand</Text>
             </TouchableOpacity>
           </View>
         )}
 
         {/* Statistics */}
-        <View style={styles.statsSection}>
-          <Text style={styles.statsTitle}>Session Stats</Text>
+        <View style={[styles.statsSection, { borderColor: colors.border }]}>
+          <Text style={[styles.statsTitle, { color: colors.text }]}>Session Stats</Text>
           <View style={styles.statsGrid}>
             <View style={styles.statItem}>
               <View style={[styles.statIconContainer, { backgroundColor: sessionStats.accuracy >= 70 ? '#dcfce7' : '#fef3c7' }]}>
@@ -303,21 +323,21 @@ export default function TrainingScreen() {
               ]}>
                 {sessionStats.accuracy}%
               </Text>
-              <Text style={styles.statLabel}>Overall Accuracy</Text>
+              <Text style={[styles.statLabel, { color: colors.textSecondary }]}>Overall Accuracy</Text>
             </View>
             <View style={styles.statItem}>
               <View style={[styles.statIconContainer, { backgroundColor: '#dbeafe' }]}>
                 <MaterialIcons name="casino" size={24} color="#3b82f6" />
               </View>
               <Text style={[styles.statValue, { color: '#3b82f6' }]}>{sessionStats.hands}</Text>
-              <Text style={styles.statLabel}>Hands Played</Text>
+              <Text style={[styles.statLabel, { color: colors.textSecondary }]}>Hands Played</Text>
             </View>
             <View style={styles.statItem}>
               <View style={[styles.statIconContainer, { backgroundColor: '#f3e8ff' }]}>
                 <Ionicons name="checkmark-circle" size={24} color="#8b5cf6" />
               </View>
               <Text style={[styles.statValue, { color: '#8b5cf6' }]}>{sessionStats.correct}</Text>
-              <Text style={styles.statLabel}>Correct Decisions</Text>
+              <Text style={[styles.statLabel, { color: colors.textSecondary }]}>Correct Decisions</Text>
             </View>
           </View>
         </View>

@@ -11,6 +11,7 @@ import {
     View,
 } from 'react-native';
 import { changeLanguage, LANGUAGES } from '../i18n';
+import { useTheme } from '@/contexts/ThemeContext';
 
 const { width } = Dimensions.get('window');
 
@@ -26,6 +27,7 @@ export const LanguageSelector: React.FC<LanguageSelectorProps> = ({
   textStyle,
 }) => {
   const { t, i18n } = useTranslation();
+  const { colors, isDark } = useTheme();
   const [modalVisible, setModalVisible] = useState(false);
   const [fadeAnim] = useState(new Animated.Value(0));
   const [scaleAnim] = useState(new Animated.Value(0.9));
@@ -74,15 +76,26 @@ export const LanguageSelector: React.FC<LanguageSelectorProps> = ({
   return (
     <View style={[styles.container, style]}>
       <TouchableOpacity
-        style={[styles.selectorButton, buttonStyle]}
+        style={[
+          styles.selectorButton, 
+          { 
+            backgroundColor: colors.surface,
+            borderColor: colors.border,
+          },
+          buttonStyle
+        ]}
         onPress={showModal}
       >
         <View style={styles.buttonContent}>
           <Text style={[styles.flagText]}>{currentLanguage.flag}</Text>
-          <Text style={[styles.languageText, textStyle]}>
+          <Text style={[
+            styles.languageText, 
+            { color: colors.text },
+            textStyle
+          ]}>
             {t(`languages.${currentLanguage.code === 'en' ? 'english' : currentLanguage.code === 'da' ? 'danish' : 'arabic'}`)}
           </Text>
-          <Ionicons name="chevron-down" size={16} color="#666" />
+          <Ionicons name="chevron-down" size={16} color={colors.textSecondary} />
         </View>
       </TouchableOpacity>
 
@@ -106,11 +119,26 @@ export const LanguageSelector: React.FC<LanguageSelectorProps> = ({
               },
             ]}
           >
-            <View style={styles.modalContent}>
-              <View style={styles.modalHeader}>
-                <Text style={styles.modalTitle}>{t('common.language')}</Text>
-                <TouchableOpacity onPress={hideModal} style={styles.closeButton}>
-                  <Ionicons name="close" size={24} color="white" />
+            <View style={[
+              styles.modalContent,
+              { 
+                backgroundColor: colors.card,
+                borderColor: colors.border,
+              }
+            ]}>
+              <View style={[
+                styles.modalHeader,
+                { borderBottomColor: colors.divider }
+              ]}>
+                <Text style={[styles.modalTitle, { color: colors.text }]}>{t('common.language')}</Text>
+                <TouchableOpacity 
+                  onPress={hideModal} 
+                  style={[
+                    styles.closeButton,
+                    { backgroundColor: colors.surface }
+                  ]}
+                >
+                  <Ionicons name="close" size={24} color={colors.text} />
                 </TouchableOpacity>
               </View>
 
@@ -120,19 +148,26 @@ export const LanguageSelector: React.FC<LanguageSelectorProps> = ({
                     key={language.code}
                     style={[
                       styles.languageOption,
-                      i18n.language === language.code && styles.selectedLanguageOption,
+                      i18n.language === language.code && [
+                        styles.selectedLanguageOption,
+                        { backgroundColor: colors.primaryLight }
+                      ],
                     ]}
                     onPress={() => selectLanguage(language.code)}
                   >
                     <Text style={styles.flagText}>{language.flag}</Text>
                     <Text style={[
                       styles.languageOptionText,
-                      i18n.language === language.code && styles.selectedLanguageText,
+                      { color: colors.text },
+                      i18n.language === language.code && [
+                        styles.selectedLanguageText,
+                        { color: colors.primary }
+                      ],
                     ]}>
                       {t(`languages.${language.code === 'en' ? 'english' : language.code === 'da' ? 'danish' : 'arabic'}`)}
                     </Text>
                     {i18n.language === language.code && (
-                      <Ionicons name="checkmark" size={20} color="white" />
+                      <Ionicons name="checkmark" size={20} color={colors.primary} />
                     )}
                   </TouchableOpacity>
                 ))}
@@ -150,12 +185,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   selectorButton: {
-    backgroundColor: '#f0f0f0',
     borderRadius: 12,
     paddingHorizontal: 16,
     paddingVertical: 8,
     borderWidth: 1,
-    borderColor: '#e0e0e0',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
@@ -173,7 +206,6 @@ const styles = StyleSheet.create({
   languageText: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#1a1a1a',
   },
   modalOverlay: {
     flex: 1,
@@ -187,11 +219,9 @@ const styles = StyleSheet.create({
     maxWidth: 300,
   },
   modalContent: {
-    backgroundColor: 'rgba(255, 255, 255, 0.1)',
     borderRadius: 20,
     padding: 20,
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.2)',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 10 },
     shadowOpacity: 0.3,
@@ -206,20 +236,14 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     paddingBottom: 16,
     borderBottomWidth: 1,
-    borderBottomColor: 'rgba(255, 255, 255, 0.2)',
   },
   modalTitle: {
     fontSize: 20,
     fontWeight: 'bold',
-    color: 'white',
-    textShadowColor: 'rgba(0, 0, 0, 0.3)',
-    textShadowOffset: { width: 0, height: 1 },
-    textShadowRadius: 2,
   },
   closeButton: {
     padding: 8,
     borderRadius: 16,
-    backgroundColor: 'rgba(255, 255, 255, 0.1)',
   },
   languageList: {
     gap: 4,
@@ -233,16 +257,14 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   selectedLanguageOption: {
-    backgroundColor: 'rgba(255, 255, 255, 0.15)',
+    // backgroundColor will be set dynamically
   },
   languageOptionText: {
     flex: 1,
     fontSize: 16,
     fontWeight: '500',
-    color: 'rgba(255, 255, 255, 0.9)',
   },
   selectedLanguageText: {
-    color: 'white',
     fontWeight: 'bold',
   },
 }); 
