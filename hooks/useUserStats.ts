@@ -2,8 +2,8 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 
 interface UserStats {
-  accuracy: number;
-  handsPlayed: number;
+  accuracy: string;
+  handsPlayed: string;
   studyTime: string;
   totalSessions: number;
   bestAccuracy: number;
@@ -13,9 +13,9 @@ interface UserStats {
 export const useUserStats = () => {
   const { user } = useAuth();
   const [stats, setStats] = useState<UserStats>({
-    accuracy: 87,
-    handsPlayed: 1247,
-    studyTime: '24h',
+    accuracy: '···',
+    handsPlayed: '···',
+    studyTime: '···h',
     totalSessions: 15,
     bestAccuracy: 95,
     lastSession: '2 hours ago'

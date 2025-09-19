@@ -564,28 +564,28 @@ export default function StatsScreen() {
     // Fallback data when no comprehensive stats available
     {
       title: 'Overall Accuracy',
-      value: '87%',
+      value: '···%',
       subtitle: '+5% this week',
       icon: 'target',
       color: '#22c55e'
     },
     {
       title: 'Hands Played',
-      value: '1,247',
+      value: '···',
       subtitle: '156 this week',
       icon: 'gamecontroller.fill',
       color: '#3b82f6'
     },
     {
       title: 'Study Time',
-      value: '24h',
+      value: '···h',
       subtitle: '3.2h this week',
       icon: 'clock.fill',
       color: '#f59e0b'
     },
     {
       title: 'Win Rate',
-      value: '+12bb/100',
+      value: '+···bb/100',
       subtitle: 'Cash games',
       icon: 'chart.line.uptrend.xyaxis',
       color: '#8b5cf6'

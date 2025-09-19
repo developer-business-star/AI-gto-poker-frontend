@@ -3,20 +3,106 @@ import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { ScrollView, StyleSheet, Switch, Text, TouchableOpacity, View } from 'react-native';
 import { useAuth } from '@/contexts/AuthContext';
 import { useUserStats } from '@/hooks/useUserStats';
+import { API_CONFIG } from '@/config/api';
+import React, { useState, useEffect } from 'react';
+
+interface ComprehensiveStats {
+  overallAccuracy: number;
+  accuracyChange: number;
+  handsPlayed: number;
+  handsThisWeek: number;
+  studyTime: string;
+  studyTimeThisWeek: string;
+  winRate: string;
+  winRateFormat: string;
+  bestAccuracy?: number;
+  positionStats: Array<{
+    position: string;
+    accuracy: number;
+    hands: number;
+    color: string;
+  }>;
+  accuracyTrend: Array<{
+    date: string;
+    accuracy: number | null;
+    hands: number;
+  }>;
+  recentSessions: Array<{
+    date: string;
+    gameType: string;
+    confidence: number;
+    recommendedAction: string;
+    result: string;
+  }>;
+}
+
 
 export default function ProfileScreen() {
   const [notifications, setNotifications] = React.useState(true);
-  const [autoCapture, setAutoCapture] = React.useState(false);
+  const [colorPalette, setColorPalette] = React.useState(false);
   const [hapticFeedback, setHapticFeedback] = React.useState(true);
   const router = useRouter();
   const { t } = useTranslation();
-  const { user, logout, isLoading } = useAuth();
+  const { user, logout, isLoading, token, isLoading: authLoading } = useAuth();
   const { stats } = useUserStats();
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [comprehensiveStats, setComprehensiveStats] = useState<ComprehensiveStats | null>(null);
+
+  const fetchComprehensiveStats = async () => {
+    if (!user?.id) return;
+
+    try {
+      setLoading(true);
+      setError(null);
+
+      console.log('📊 Fetching comprehensive user statistics...');
+      
+      // Import the API service dynamically
+      const { default: ApiService } = await import('@/services/apiService');
+      const response = await ApiService.getComprehensiveStats(user.id);
+
+      if (response.success && response.stats) {
+        setComprehensiveStats(response.stats);
+        console.log('✅ Comprehensive stats loaded:', response.stats);
+      } else {
+        throw new Error(response.error || 'Failed to fetch comprehensive stats');
+      }
+
+    } catch (err) {
+      console.error('❌ Error fetching comprehensive stats:', err);
+      
+      let errorMessage = 'Failed to load comprehensive statistics';
+      
+      if (err instanceof Error) {
+        if (err.name === 'AbortError') {
+          errorMessage = 'Request timed out. Please check your connection.';
+        } else if (err.message.includes('Network request failed')) {
+          errorMessage = 'Network error. Please check if the backend server is running.';
+        } else {
+          errorMessage = err.message;
+        }
+      }
+      
+      setError(errorMessage);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (!authLoading && user && token) {
+      fetchComprehensiveStats();
+    } else if (!authLoading && (!user || !token)) {
+      setLoading(false);
+      setError('User not authenticated');
+    }
+  }, [authLoading, user, token]);
+
 
   // Redirect to auth if no user
   React.useEffect(() => {
@@ -100,17 +186,17 @@ export default function ProfileScreen() {
         {/* Quick Stats */}
         <View style={styles.quickStats}>
           <View style={styles.quickStatItem}>
-            <Text style={styles.quickStatValue}>{stats.accuracy}%</Text>
+            <Text style={styles.quickStatValue}>{comprehensiveStats?.overallAccuracy ? comprehensiveStats?.overallAccuracy : '···'}%</Text>
             <Text style={styles.quickStatLabel}>{t('dashboard.accuracy')}</Text>
           </View>
           <View style={styles.quickStatDivider} />
           <View style={styles.quickStatItem}>
-            <Text style={styles.quickStatValue}>{stats.handsPlayed.toLocaleString()}</Text>
+            <Text style={styles.quickStatValue}>{comprehensiveStats?.handsPlayed.toLocaleString() ? comprehensiveStats?.handsPlayed.toLocaleString() : '···'}</Text>
             <Text style={styles.quickStatLabel}>{t('dashboard.handsPlayed')}</Text>
           </View>
           <View style={styles.quickStatDivider} />
           <View style={styles.quickStatItem}>
-            <Text style={styles.quickStatValue}>{stats.studyTime}</Text>
+            <Text style={styles.quickStatValue}>{comprehensiveStats?.studyTime ? comprehensiveStats?.studyTime : '···h'}</Text>
             <Text style={styles.quickStatLabel}>{t('dashboard.studyTime')}</Text>
           </View>
         </View>
@@ -141,7 +227,7 @@ export default function ProfileScreen() {
                 <Text style={styles.menuLabel}>Account Status</Text>
               </View>
               <View style={styles.menuRight}>
-                <Text style={[styles.menuValue, { color: '#22c55e' }]}>Active</Text>
+                <Text style={[styles.menuValue, { color: '#22c55e' }]}>{user?.isActive ? 'Active' : 'Inactive'}</Text>
               </View>
             </View>
             
@@ -153,7 +239,7 @@ export default function ProfileScreen() {
                 <Text style={styles.menuLabel}>Best Accuracy</Text>
               </View>
               <View style={styles.menuRight}>
-                <Text style={styles.menuValue}>{stats.bestAccuracy}%</Text>
+                <Text style={styles.menuValue}>{comprehensiveStats?.bestAccuracy ? comprehensiveStats?.bestAccuracy : '···'}%</Text>
               </View>
             </View>
           </View>
@@ -190,12 +276,12 @@ export default function ProfileScreen() {
             
             <View style={styles.settingItem}>
               <View style={styles.settingLeft}>
-                <Ionicons name="camera" size={20} color="#007AFF" />
-                <Text style={styles.settingLabel}>{t('profile.settings.autoCapture')}</Text>
+                <Ionicons name="color-palette" size={20} color="#007AFF" />
+                <Text style={styles.settingLabel}>{t('profile.settings.colorPalette')}</Text>
               </View>
               <Switch
-                value={autoCapture}
-                onValueChange={setAutoCapture}
+                value={colorPalette}
+                onValueChange={setColorPalette}
                 trackColor={{ false: '#f0f0f0', true: '#007AFF' }}
                 thumbColor="white"
               />

@@ -862,21 +862,21 @@ export default function HomeScreen() {
           <View style={styles.statCard}>
             <Ionicons name="documents" size={20} color="#6b7280" />
             <Text style={styles.statValue}>
-              {isLoadingFormatStats ? '...' : getCurrentFormatStats().handsAnalyzed}
+              {isLoadingFormatStats ? '···' : getCurrentFormatStats().handsAnalyzed}
             </Text>
             <Text style={styles.statLabel}>Hands Analyzed</Text>
           </View>
           <View style={styles.statCard}>
             <MaterialIcons name="gps-fixed" size={20} color="#6b7280" />
             <Text style={styles.statValue}>
-              {isLoadingFormatStats ? '...' : `${Math.round(getCurrentFormatStats().accuracyRate)}%`}
+              {isLoadingFormatStats ? '···' : `${Math.round(getCurrentFormatStats().accuracyRate)}%`}
             </Text>
             <Text style={styles.statLabel}>Accuracy Rate</Text>
           </View>
           <View style={styles.statCard}>
             <Ionicons name="time" size={20} color="#6b7280" />
             <Text style={styles.statValue}>
-              {isLoadingFormatStats ? '...' : getCurrentFormatStats().studyTime}
+              {isLoadingFormatStats ? '···' : getCurrentFormatStats().studyTime}
             </Text>
             <Text style={styles.statLabel}>Study Time</Text>
           </View>

@@ -281,7 +281,7 @@
     "settings": {
       "language": "Language",
       "notifications": "Push Notifications",
-      "autoCapture": "Auto Camera Capture",
+      "colorPalette": "Color Palette",
       "hapticFeedback": "Haptic Feedback",
       "defaultGameType": "Default Game Type",
       "stackSize": "Stack Size",

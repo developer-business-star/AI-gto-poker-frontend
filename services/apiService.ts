@@ -43,6 +43,7 @@ export interface User {
   id: string;
   fullName: string;
   email: string;
+  isActive?: boolean;
   avatar: {
     id: string;
     icon: string;
@@ -346,102 +347,6 @@ class ApiService {
       throw new Error('Failed to upload image for analysis');
     }
   }
-
-  /**
-   * Get analysis result by ID
-   */
-  // async getAnalysisResult(analysisId: string): Promise<ResultResponse> {
-  //   try {
-  //     console.log(`🔍 Fetching analysis result for ID: ${analysisId}`);
-
-  //     const controller = new AbortController();
-  //     const timeoutId = setTimeout(() => controller.abort(), API_CONFIG.TIMEOUT);
-
-  //     const response = await fetch(`${this.baseUrl}/analysis/result/${analysisId}`, {
-  //       method: 'GET',
-  //       headers: {
-  //         'Content-Type': 'application/json',
-  //       },
-  //       signal: controller.signal,
-  //     });
-
-  //     clearTimeout(timeoutId);
-
-  //     if (!response.ok) {
-  //       if (response.status === 404) {
-  //         return {
-  //           success: false,
-  //           error: 'Analysis not found or still processing'
-  //         };
-  //       }
-  //       const errorData = await response.json().catch(() => ({}));
-  //       throw new Error(errorData.error || `Failed to get result: ${response.status} ${response.statusText}`);
-  //     }
-
-  //     const result: ResultResponse = await response.json();
-      
-  //     if (result.success && result.result) {
-  //       console.log(`✅ Analysis result received - Decision: ${result.result.decision}`);
-  //     }
-      
-  //     return result;
-  //   } catch (error) {
-  //     console.error('❌ Error fetching analysis result:', error);
-      
-  //     if (error instanceof Error) {
-  //       if (error.name === 'AbortError') {
-  //         throw new Error('Request timeout - Please check your connection');
-  //       }
-        
-  //       if (error.message.includes('Network request failed')) {
-  //         throw new Error('Network connection failed - Please check if backend server is running');
-  //       }
-        
-  //       throw error;
-  //     }
-      
-  //     throw new Error('Failed to retrieve analysis result');
-  // }
-
-  /**
-   * Poll for analysis result with timeout
-   */
-  // async pollForResult(
-  //   analysisId: string, 
-  //   maxAttempts: number = API_CONFIG.POLLING.MAX_ATTEMPTS, 
-  //   intervalMs: number = API_CONFIG.POLLING.INTERVAL_MS
-  // ): Promise<AnalysisResult> {
-  //   console.log(`⏳ Polling for analysis result - ID: ${analysisId}`);
-
-  //   for (let attempt = 1; attempt <= maxAttempts; attempt++) {
-  //     try {
-  //       const response = await this.getAnalysisResult(analysisId);
-        
-  //       if (response.success && response.result && response.result.status === 'completed') {
-  //         console.log(`🎯 Analysis completed after ${attempt} attempts`);
-  //         return response.result;
-  //       }
-        
-  //       if (response.result && response.result.status === 'failed') {
-  //         throw new Error('Analysis failed on the server');
-  //       }
-
-  //       // Wait before next attempt
-  //       if (attempt < maxAttempts) {
-  //         console.log(`⏰ Attempt ${attempt}/${maxAttempts} - Waiting ${intervalMs}ms...`);
-  //         await new Promise(resolve => setTimeout(resolve, intervalMs));
-  //       }
-  //     } catch (error) {
-  //       if (attempt === maxAttempts) {
-  //         throw error;
-  //       }
-  //       console.log(`⚠️ Attempt ${attempt} failed, retrying...`);
-  //       await new Promise(resolve => setTimeout(resolve, intervalMs));
-  //     }
-  //   }
-
-  //   throw new Error('Analysis timeout - Please try again');
-  // }
 
   /**
    * Test backend connectivity with improved diagnostics
@@ -846,4 +751,4 @@ class ApiService {
   }
 }
 
-export default new ApiService(); 
+export default new ApiService();
