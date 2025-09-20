@@ -7,6 +7,15 @@ import { useTranslation } from 'react-i18next';
 import { ScrollView, StyleSheet, Switch, Text, TouchableOpacity, View } from 'react-native';
 import { useAuth } from '@/contexts/AuthContext';
 import { useTheme } from '@/contexts/ThemeContext';
+import { useHaptic } from '@/contexts/HapticContext';
+import { useGame } from '@/contexts/GameContext';
+import GameTypeModal from '@/components/GameTypeModal';
+import StackSizeModal from '@/components/StackSizeModal';
+import AnalysisSpeedModal from '@/components/AnalysisSpeedModal';
+import DifficultyLevelModal from '@/components/DifficultyLevelModal';
+import SessionLengthModal from '@/components/SessionLengthModal';
+import FocusAreasModal from '@/components/FocusAreasModal';
+import ClearCacheModal from '@/components/ClearCacheModal';
 import { useUserStats } from '@/hooks/useUserStats';
 import { API_CONFIG } from '@/config/api';
 import React, { useState, useEffect } from 'react';
@@ -44,8 +53,16 @@ interface ComprehensiveStats {
 
 export default function ProfileScreen() {
   const [notifications, setNotifications] = React.useState(true);
-  const [hapticFeedback, setHapticFeedback] = React.useState(true);
+  const [gameTypeModalVisible, setGameTypeModalVisible] = React.useState(false);
+  const [stackSizeModalVisible, setStackSizeModalVisible] = React.useState(false);
+  const [analysisSpeedModalVisible, setAnalysisSpeedModalVisible] = React.useState(false);
+  const [difficultyLevelModalVisible, setDifficultyLevelModalVisible] = React.useState(false);
+  const [sessionLengthModalVisible, setSessionLengthModalVisible] = React.useState(false);
+  const [focusAreasModalVisible, setFocusAreasModalVisible] = React.useState(false);
+  const [clearCacheModalVisible, setClearCacheModalVisible] = React.useState(false);
   const router = useRouter();
+  const { hapticEnabled, toggleHaptic, triggerHaptic } = useHaptic();
+  const { selectedFormat, setSelectedFormat, formatDisplayName, selectedStackSize, setSelectedStackSize, stackSizeDisplayName, selectedAnalysisSpeed, setSelectedAnalysisSpeed, analysisSpeedDisplayName, selectedDifficultyLevel, setSelectedDifficultyLevel, difficultyLevelDisplayName, selectedSessionLength, setSelectedSessionLength, sessionLengthDisplayName, sessionDurationMinutes, selectedFocusAreas, setSelectedFocusAreas, focusAreasDisplayName } = useGame();
   const { t } = useTranslation();
   const { user, logout, isLoading, token, isLoading: authLoading } = useAuth();
   const { colors, isDark, toggleTheme } = useTheme();
@@ -136,29 +153,124 @@ export default function ProfileScreen() {
     }
   };
 
+  const handleGameTypeSelect = (gameType: 'cash' | 'tournaments') => {
+    setSelectedFormat(gameType);
+    triggerHaptic('success');
+  };
+
+  const handleGameTypePress = () => {
+    triggerHaptic('light');
+    setGameTypeModalVisible(true);
+  };
+
+  const handleStackSizeSelect = (stackSize: string) => {
+    setSelectedStackSize(stackSize as any);
+    triggerHaptic('success');
+  };
+
+  const handleStackSizePress = () => {
+    triggerHaptic('light');
+    setStackSizeModalVisible(true);
+  };
+
+  const handleAnalysisSpeedSelect = (analysisSpeed: string) => {
+    setSelectedAnalysisSpeed(analysisSpeed as any);
+    triggerHaptic('success');
+  };
+
+  const handleAnalysisSpeedPress = () => {
+    triggerHaptic('light');
+    setAnalysisSpeedModalVisible(true);
+  };
+
+  const handleDifficultyLevelSelect = (difficultyLevel: string) => {
+    setSelectedDifficultyLevel(difficultyLevel as any);
+    triggerHaptic('success');
+  };
+
+  const handleDifficultyLevelPress = () => {
+    triggerHaptic('light');
+    setDifficultyLevelModalVisible(true);
+  };
+
+  const handleSessionLengthSelect = (sessionLength: string) => {
+    setSelectedSessionLength(sessionLength as any);
+    triggerHaptic('success');
+  };
+
+  const handleSessionLengthPress = () => {
+    triggerHaptic('light');
+    setSessionLengthModalVisible(true);
+  };
+
+  const handleFocusAreasSelect = (focusAreas: string[]) => {
+    setSelectedFocusAreas(focusAreas as any);
+    triggerHaptic('success');
+  };
+
+  const handleFocusAreasPress = () => {
+    triggerHaptic('light');
+    setFocusAreasModalVisible(true);
+  };
+
+  const handleClearCachePress = () => {
+    triggerHaptic('light');
+    setClearCacheModalVisible(true);
+  };
+
   const menuItems = [
     {
       title: t('profile.gamePreferences'),
       items: [
-        { label: t('profile.settings.defaultGameType'), value: 'Cash Game', icon: 'game-controller' },
-        { label: t('profile.settings.stackSize'), value: '100bb', icon: 'layers' },
-        { label: t('profile.settings.analysisSpeed'), value: 'Fast', icon: 'speedometer' },
+        { 
+          label: t('profile.settings.defaultGameType'), 
+          value: formatDisplayName, 
+          icon: 'game-controller',
+          onPress: handleGameTypePress
+        },
+        { 
+          label: t('profile.settings.stackSize'), 
+          value: stackSizeDisplayName, 
+          icon: 'layers',
+          onPress: handleStackSizePress
+        },
+        { 
+          label: t('profile.settings.analysisSpeed'), 
+          value: analysisSpeedDisplayName, 
+          icon: 'speedometer',
+          onPress: handleAnalysisSpeedPress
+        },
       ]
     },
     {
       title: t('profile.trainingSettings'),
       items: [
-        { label: t('profile.settings.difficultyLevel'), value: 'Advanced', icon: 'library' },
-        { label: t('profile.settings.sessionLength'), value: '30 minutes', icon: 'time' },
-        { label: t('profile.settings.focusAreas'), value: 'Preflop, Turn', icon: 'bulb' },
+        { 
+          label: t('profile.settings.difficultyLevel'), 
+          value: difficultyLevelDisplayName, 
+          icon: 'library', 
+          onPress: handleDifficultyLevelPress 
+        },
+        { 
+          label: t('profile.settings.sessionLength'), 
+          value: sessionLengthDisplayName, 
+          icon: 'time', 
+          onPress: handleSessionLengthPress 
+        },
+        { 
+          label: t('profile.settings.focusAreas'), 
+          value: focusAreasDisplayName, 
+          icon: 'bulb', 
+          onPress: handleFocusAreasPress 
+        },
       ]
     },
     {
       title: t('profile.dataPrivacy'),
       items: [
-        { label: t('profile.settings.exportHandHistory'), value: '', icon: 'share' },
-        { label: t('profile.settings.clearCache'), value: '', icon: 'trash' },
-        { label: t('profile.settings.privacyPolicy'), value: '', icon: 'shield-checkmark' },
+        { label: t('profile.settings.exportHandHistory'), value: '', icon: 'share', onPress: undefined },
+        { label: t('profile.settings.clearCache'), value: '', icon: 'trash', onPress: handleClearCachePress },
+        { label: t('profile.settings.privacyPolicy'), value: '', icon: 'shield-checkmark', onPress: undefined },
       ]
     }
   ];
@@ -308,8 +420,11 @@ export default function ProfileScreen() {
                 <Text style={[styles.settingLabel, { color: colors.text }]}>{t('profile.settings.hapticFeedback')}</Text>
               </View>
               <Switch
-                value={hapticFeedback}
-                onValueChange={setHapticFeedback}
+                value={hapticEnabled}
+                onValueChange={() => {
+                  toggleHaptic();
+                  triggerHaptic('light');
+                }}
                 trackColor={{ false: colors.toggleInactive, true: colors.toggleActive }}
                 thumbColor={colors.toggleThumb}
               />
@@ -356,6 +471,8 @@ export default function ProfileScreen() {
                       { borderBottomColor: colors.divider },
                       itemIndex === section.items.length - 1 && { borderBottomWidth: 0 }
                     ]}
+                    onPress={item.onPress || (() => {})}
+                    disabled={!item.onPress}
                   >
                     <View style={styles.menuLeft}>
                       <View style={[styles.iconBackground, { backgroundColor: iconColor + '15' }]}>
@@ -439,6 +556,60 @@ export default function ProfileScreen() {
           </TouchableOpacity>
         </View>
       </ScrollView>
+
+      {/* Game Type Selection Modal */}
+      <GameTypeModal
+        visible={gameTypeModalVisible}
+        onClose={() => setGameTypeModalVisible(false)}
+        currentGameType={selectedFormat}
+        onGameTypeSelect={handleGameTypeSelect}
+      />
+
+      {/* Stack Size Selection Modal */}
+      <StackSizeModal
+        visible={stackSizeModalVisible}
+        onClose={() => setStackSizeModalVisible(false)}
+        currentStackSize={selectedStackSize}
+        onStackSizeSelect={handleStackSizeSelect}
+      />
+
+      {/* Analysis Speed Selection Modal */}
+      <AnalysisSpeedModal
+        visible={analysisSpeedModalVisible}
+        onClose={() => setAnalysisSpeedModalVisible(false)}
+        currentAnalysisSpeed={selectedAnalysisSpeed}
+        onAnalysisSpeedSelect={handleAnalysisSpeedSelect}
+      />
+
+      {/* Difficulty Level Selection Modal */}
+      <DifficultyLevelModal
+        visible={difficultyLevelModalVisible}
+        onClose={() => setDifficultyLevelModalVisible(false)}
+        currentDifficultyLevel={selectedDifficultyLevel}
+        onDifficultyLevelSelect={handleDifficultyLevelSelect}
+      />
+
+      {/* Session Length Selection Modal */}
+      <SessionLengthModal
+        visible={sessionLengthModalVisible}
+        onClose={() => setSessionLengthModalVisible(false)}
+        currentSessionLength={selectedSessionLength}
+        onSessionLengthSelect={handleSessionLengthSelect}
+      />
+
+      {/* Focus Areas Selection Modal */}
+      <FocusAreasModal
+        visible={focusAreasModalVisible}
+        onClose={() => setFocusAreasModalVisible(false)}
+        currentFocusAreas={selectedFocusAreas}
+        onFocusAreasSelect={handleFocusAreasSelect}
+      />
+
+      {/* Clear Cache Modal */}
+      <ClearCacheModal
+        visible={clearCacheModalVisible}
+        onClose={() => setClearCacheModalVisible(false)}
+      />
     </ThemedView>
   );
 }

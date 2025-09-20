@@ -2,9 +2,10 @@ import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import { useGame } from '@/contexts/GameContext';
 import { useTheme } from '@/contexts/ThemeContext';
+import { useHaptic } from '@/contexts/HapticContext';
 import { Ionicons, MaterialIcons } from '@expo/vector-icons';
 import { useLocalSearchParams } from 'expo-router';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 interface HandData {
@@ -21,8 +22,9 @@ interface HandData {
 
 export default function TrainingScreen() {
   const params = useLocalSearchParams();
-  const { selectedFormat, formatDisplayName } = useGame();
+  const { selectedFormat, formatDisplayName, sessionDurationMinutes, selectedFocusAreas } = useGame();
   const { colors, isDark } = useTheme();
+  const { triggerHaptic } = useHaptic();
   
   // Prioritize global context over route parameters
   const gameType = selectedFormat;
@@ -40,6 +42,8 @@ export default function TrainingScreen() {
     ante: gameType === 'tournaments' ? 10 : undefined,
   });
 
+  const [currentScenarioIndex, setCurrentScenarioIndex] = useState(0);
+
   const [selectedAction, setSelectedAction] = useState<string | null>(null);
   const [showResult, setShowResult] = useState(false);
   const [gtoDecision, setGtoDecision] = useState('');
@@ -48,6 +52,213 @@ export default function TrainingScreen() {
     correct: 0,
     accuracy: 0
   });
+
+  // Session timing state
+  const [sessionTime, setSessionTime] = useState(0); // Time in seconds
+  const [sessionActive, setSessionActive] = useState(false);
+  const [sessionEnded, setSessionEnded] = useState(false);
+
+  // Session timer effect
+  useEffect(() => {
+    let interval: ReturnType<typeof setInterval> | null = null;
+    
+    if (sessionActive && !sessionEnded) {
+      interval = setInterval(() => {
+        setSessionTime(prevTime => {
+          const newTime = prevTime + 1;
+          // Check if session time has reached the selected duration
+          if (newTime >= sessionDurationMinutes * 60) {
+            setSessionEnded(true);
+            setSessionActive(false);
+            triggerHaptic('success'); // Notify user that session ended
+            return sessionDurationMinutes * 60; // Cap at max time
+          }
+          return newTime;
+        });
+      }, 1000);
+    }
+
+    return () => {
+      if (interval) {
+        clearInterval(interval);
+      }
+    };
+  }, [sessionActive, sessionEnded, sessionDurationMinutes, triggerHaptic]);
+
+  // Start session when component mounts
+  useEffect(() => {
+    setSessionActive(true);
+    setSessionTime(0);
+    setSessionEnded(false);
+  }, [sessionDurationMinutes]); // Restart when session length changes
+
+  // Update current hand when focus areas change
+  useEffect(() => {
+    if (trainingScenarios.length > 0) {
+      const randomIndex = Math.floor(Math.random() * trainingScenarios.length);
+      setCurrentScenarioIndex(randomIndex);
+      setCurrentHand(trainingScenarios[randomIndex]);
+    }
+  }, [selectedFocusAreas]); // Remove trainingScenarios from dependency array
+
+  // Helper function to format time
+  const formatTime = (seconds: number): string => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+  };
+
+  // Calculate remaining time
+  const remainingTime = sessionDurationMinutes * 60 - sessionTime;
+  const progressPercentage = (sessionTime / (sessionDurationMinutes * 60)) * 100;
+
+  // Focus area-based training scenarios
+  const trainingScenarios = useMemo(() => {
+    const allScenarios = {
+      preflop: [
+        {
+          heroCards: ['A♠', 'K♥'],
+          board: [],
+          position: 'Button',
+          stackSize: gameType === 'cash' ? 100 : 15,
+          potSize: gameType === 'cash' ? 3 : 1.5,
+          action: gameType === 'cash' ? 'UTG opens 2.5bb' : 'UTG shoves 12bb',
+          gameType: gameType,
+          blindLevel: gameType === 'tournaments' ? '50/100' : undefined,
+          ante: gameType === 'tournaments' ? 10 : undefined,
+          focusArea: 'preflop',
+          description: 'UTG opens, action to you on the button'
+        },
+        {
+          heroCards: ['Q♠', 'Q♥'],
+          board: [],
+          position: 'UTG',
+          stackSize: gameType === 'cash' ? 100 : 15,
+          potSize: gameType === 'cash' ? 1.5 : 1.5,
+          action: 'Action to you first to act',
+          gameType: gameType,
+          blindLevel: gameType === 'tournaments' ? '50/100' : undefined,
+          ante: gameType === 'tournaments' ? 10 : undefined,
+          focusArea: 'preflop',
+          description: 'You have pocket queens UTG'
+        }
+      ],
+      flop: [
+        {
+          heroCards: ['A♠', 'K♥'],
+          board: ['A♦', '7♣', '2♠'],
+          position: 'Button',
+          stackSize: gameType === 'cash' ? 100 : 15,
+          potSize: gameType === 'cash' ? 15 : 3,
+          action: 'Villain checks, action to you',
+          gameType: gameType,
+          blindLevel: gameType === 'tournaments' ? '50/100' : undefined,
+          ante: gameType === 'tournaments' ? 10 : undefined,
+          focusArea: 'flop',
+          description: 'You have top pair on a dry board'
+        }
+      ],
+      turn: [
+        {
+          heroCards: ['A♠', 'K♥'],
+          board: ['A♦', '7♣', '2♠', 'K♣'],
+          position: 'Button',
+          stackSize: gameType === 'cash' ? 100 : 15,
+          potSize: gameType === 'cash' ? 30 : 6,
+          action: 'Villain bets 15bb, action to you',
+          gameType: gameType,
+          blindLevel: gameType === 'tournaments' ? '50/100' : undefined,
+          ante: gameType === 'tournaments' ? 10 : undefined,
+          focusArea: 'turn',
+          description: 'You have two pair, villain bets'
+        }
+      ],
+      river: [
+        {
+          heroCards: ['A♠', 'K♥'],
+          board: ['A♦', '7♣', '2♠', 'K♣', '9♥'],
+          position: 'Button',
+          stackSize: gameType === 'cash' ? 100 : 15,
+          potSize: gameType === 'cash' ? 60 : 12,
+          action: 'Villain checks, action to you',
+          gameType: gameType,
+          blindLevel: gameType === 'tournaments' ? '50/100' : undefined,
+          ante: gameType === 'tournaments' ? 10 : undefined,
+          focusArea: 'river',
+          description: 'You have two pair, villain checks river'
+        }
+      ],
+      bluffing: [
+        {
+          heroCards: ['9♠', '8♠'],
+          board: ['A♦', 'K♣', 'Q♠', 'J♥'],
+          position: 'Button',
+          stackSize: gameType === 'cash' ? 100 : 15,
+          potSize: gameType === 'cash' ? 20 : 4,
+          action: 'Villain checks, action to you',
+          gameType: gameType,
+          blindLevel: gameType === 'tournaments' ? '50/100' : undefined,
+          ante: gameType === 'tournaments' ? 10 : undefined,
+          focusArea: 'bluffing',
+          description: 'You have a straight draw, good bluff spot?'
+        }
+      ],
+      value_betting: [
+        {
+          heroCards: ['A♠', 'A♥'],
+          board: ['A♦', '7♣', '2♠', 'K♣'],
+          position: 'Button',
+          stackSize: gameType === 'cash' ? 100 : 15,
+          potSize: gameType === 'cash' ? 30 : 6,
+          action: 'Villain checks, action to you',
+          gameType: gameType,
+          blindLevel: gameType === 'tournaments' ? '50/100' : undefined,
+          ante: gameType === 'tournaments' ? 10 : undefined,
+          focusArea: 'value_betting',
+          description: 'You have top set, value bet sizing?'
+        }
+      ],
+      position: [
+        {
+          heroCards: ['J♠', 'T♥'],
+          board: ['9♦', '8♣', '7♠'],
+          position: 'Small Blind',
+          stackSize: gameType === 'cash' ? 100 : 15,
+          potSize: gameType === 'cash' ? 10 : 2,
+          action: 'Action to you in small blind',
+          gameType: gameType,
+          blindLevel: gameType === 'tournaments' ? '50/100' : undefined,
+          ante: gameType === 'tournaments' ? 10 : undefined,
+          focusArea: 'position',
+          description: 'You have a straight in small blind'
+        }
+      ],
+      stack_sizes: [
+        {
+          heroCards: ['A♠', 'K♥'],
+          board: ['A♦', '7♣', '2♠'],
+          position: 'Button',
+          stackSize: gameType === 'cash' ? 200 : 8,
+          potSize: gameType === 'cash' ? 15 : 3,
+          action: 'Villain bets 10bb, action to you',
+          gameType: gameType,
+          blindLevel: gameType === 'tournaments' ? '50/100' : undefined,
+          ante: gameType === 'tournaments' ? 10 : undefined,
+          focusArea: 'stack_sizes',
+          description: gameType === 'cash' ? 'Deep stack play' : 'Short stack decision'
+        }
+      ]
+    };
+
+    // Filter scenarios based on selected focus areas
+    if (selectedFocusAreas.length === 0) {
+      // If no focus areas selected, return all scenarios
+      return Object.values(allScenarios).flat();
+    }
+
+    // Return scenarios for selected focus areas
+    return selectedFocusAreas.flatMap(area => allScenarios[area] || []);
+  }, [selectedFocusAreas, gameType]);
 
   const actions = gameType === 'cash' 
     ? [
@@ -64,6 +275,8 @@ export default function TrainingScreen() {
 
   const handleActionPress = (action: string) => {
     setSelectedAction(action);
+    triggerHaptic('light'); // Haptic feedback for action selection
+    
     // Simulate GTO calculation
     setTimeout(() => {
       const actionIds = actions.map(a => a.id);
@@ -73,6 +286,14 @@ export default function TrainingScreen() {
       
       // Update session stats
       const isCorrect = action === randomGto;
+      
+      // Haptic feedback for result
+      if (isCorrect) {
+        triggerHaptic('success');
+      } else {
+        triggerHaptic('error');
+      }
+      
       setSessionStats(prev => ({
         hands: prev.hands + 1,
         correct: prev.correct + (isCorrect ? 1 : 0),
@@ -90,45 +311,53 @@ export default function TrainingScreen() {
   };
 
   const nextHand = () => {
+    triggerHaptic('medium'); // Haptic feedback for next hand
     setSelectedAction(null);
     setShowResult(false);
     setGtoDecision('');
     
-    // Generate new hand based on game type
-    const cards = ['A♠', 'K♥', 'Q♦', 'J♣', '10♠', '9♥', '8♦', '7♣'];
-    const newHeroCards = [
-      cards[Math.floor(Math.random() * cards.length)],
-      cards[Math.floor(Math.random() * cards.length)]
-    ];
-    
-    const positions = gameType === 'cash' 
-      ? ['UTG', 'MP', 'CO', 'Button', 'SB', 'BB']
-      : ['UTG', 'MP', 'CO', 'Button', 'SB', 'BB'];
-    
-    const newPosition = positions[Math.floor(Math.random() * positions.length)];
-    
-    if (gameType === 'cash') {
-      setCurrentHand({
-        ...currentHand,
-        heroCards: newHeroCards,
-        position: newPosition,
-        stackSize: Math.floor(Math.random() * 200) + 50, // 50-250bb
-        potSize: Math.floor(Math.random() * 30) + 5,
-        action: `Villain bets ${Math.floor(Math.random() * 20) + 5}bb`,
-        gameType: 'cash'
-      });
+    // Select next scenario from focus areas
+    if (trainingScenarios.length > 0) {
+      const randomIndex = Math.floor(Math.random() * trainingScenarios.length);
+      setCurrentScenarioIndex(randomIndex);
+      setCurrentHand(trainingScenarios[randomIndex]);
     } else {
-      setCurrentHand({
-        ...currentHand,
-        heroCards: newHeroCards,
-        position: newPosition,
-        stackSize: Math.floor(Math.random() * 20) + 8, // 8-28bb
-        potSize: Math.floor(Math.random() * 8) + 2,
-        action: `Villain shoves ${Math.floor(Math.random() * 15) + 8}bb`,
-        gameType: 'tournaments',
-        blindLevel: ['25/50', '50/100', '75/150', '100/200'][Math.floor(Math.random() * 4)],
-        ante: [0, 5, 10, 15][Math.floor(Math.random() * 4)]
-      });
+      // Fallback to default hand if no scenarios available
+      const cards = ['A♠', 'K♥', 'Q♦', 'J♣', '10♠', '9♥', '8♦', '7♣'];
+      const newHeroCards = [
+        cards[Math.floor(Math.random() * cards.length)],
+        cards[Math.floor(Math.random() * cards.length)]
+      ];
+      
+      const positions = gameType === 'cash' 
+        ? ['UTG', 'MP', 'CO', 'Button', 'SB', 'BB']
+        : ['UTG', 'MP', 'CO', 'Button', 'SB', 'BB'];
+      
+      const newPosition = positions[Math.floor(Math.random() * positions.length)];
+      
+      if (gameType === 'cash') {
+        setCurrentHand({
+          ...currentHand,
+          heroCards: newHeroCards,
+          position: newPosition,
+          stackSize: Math.floor(Math.random() * 200) + 50, // 50-250bb
+          potSize: Math.floor(Math.random() * 30) + 5,
+          action: `Villain bets ${Math.floor(Math.random() * 20) + 5}bb`,
+          gameType: 'cash'
+        });
+      } else {
+        setCurrentHand({
+          ...currentHand,
+          heroCards: newHeroCards,
+          position: newPosition,
+          stackSize: Math.floor(Math.random() * 20) + 8, // 8-28bb
+          potSize: Math.floor(Math.random() * 8) + 2,
+          action: `Villain shoves ${Math.floor(Math.random() * 15) + 8}bb`,
+          gameType: 'tournaments',
+          blindLevel: ['25/50', '50/100', '75/150', '100/200'][Math.floor(Math.random() * 4)],
+          ante: [0, 5, 10, 15][Math.floor(Math.random() * 4)]
+        });
+      }
     }
   };
 
@@ -233,6 +462,61 @@ export default function TrainingScreen() {
             )}
           </View>
         </View>
+
+        {/* Session Timer */}
+        <View style={[
+          styles.sessionTimer,
+          { 
+            backgroundColor: colors.card,
+            borderColor: sessionEnded ? colors.error : colors.border
+          }
+        ]}>
+          <View style={styles.timerHeader}>
+            <Text style={[styles.timerTitle, { color: colors.text }]}>
+              {sessionEnded ? 'Session Complete!' : 'Session Timer'}
+            </Text>
+            <Text style={[styles.timerTime, { color: sessionEnded ? colors.error : colors.primary }]}>
+              {formatTime(sessionTime)}
+            </Text>
+          </View>
+          
+          <View style={styles.timerProgress}>
+            <View style={[
+              styles.timerProgressBar,
+              { 
+                backgroundColor: colors.divider,
+                width: '100%'
+              }
+            ]}>
+              <View style={[
+                styles.timerProgressFill,
+                { 
+                  backgroundColor: sessionEnded ? colors.error : colors.primary,
+                  width: `${Math.min(progressPercentage, 100)}%`
+                }
+              ]} />
+            </View>
+            <Text style={[styles.timerRemaining, { color: colors.textSecondary }]}>
+              {sessionEnded ? 'Session ended' : `${formatTime(remainingTime)} remaining`}
+            </Text>
+          </View>
+        </View>
+
+        {/* Focus Areas Indicator */}
+        {selectedFocusAreas.length > 0 && (
+          <View style={[styles.focusAreasIndicator, { backgroundColor: colors.card, borderColor: colors.border }]}>
+            <Text style={[styles.focusAreasTitle, { color: colors.text }]}>Focus Areas:</Text>
+            <View style={styles.focusAreasTags}>
+              {selectedFocusAreas.map((area, index) => (
+                <View key={index} style={[styles.focusAreaTag, { backgroundColor: colors.primary + '15' }]}>
+                  <Text style={[styles.focusAreaTagText, { color: colors.primary }]}>
+                    {area.charAt(0).toUpperCase() + area.slice(1).replace('_', ' ')}
+                  </Text>
+                </View>
+              ))}
+            </View>
+          </View>
+        )}
 
         {/* Game Type Indicator */}
         <View style={styles.gameTypeIndicator}>
@@ -637,5 +921,85 @@ const styles = StyleSheet.create({
     color: '#6b7280',
     textAlign: 'center',
     fontWeight: '500',
+  },
+  // Session Timer Styles
+  sessionTimer: {
+    marginHorizontal: 20,
+    marginBottom: 20,
+    padding: 16,
+    borderRadius: 12,
+    borderWidth: 1,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
+    elevation: 3,
+  },
+  timerHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  timerTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  timerTime: {
+    fontSize: 18,
+    fontWeight: '700',
+    fontFamily: 'monospace',
+  },
+  timerProgress: {
+    gap: 8,
+  },
+  timerProgressBar: {
+    height: 6,
+    borderRadius: 3,
+    overflow: 'hidden',
+  },
+  timerProgressFill: {
+    height: '100%',
+    borderRadius: 3,
+    // transition: 'width 0.3s ease',
+  },
+  timerRemaining: {
+    fontSize: 12,
+    textAlign: 'center',
+    fontWeight: '500',
+  },
+  // Focus Areas Styles
+  focusAreasIndicator: {
+    marginHorizontal: 20,
+    marginBottom: 20,
+    padding: 16,
+    borderRadius: 12,
+    borderWidth: 1,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
+    elevation: 3,
+  },
+  focusAreasTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    marginBottom: 8,
+  },
+  focusAreasTags: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+  },
+  focusAreaTag: {
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: 'transparent',
+  },
+  focusAreaTagText: {
+    fontSize: 12,
+    fontWeight: '600',
   },
 }); 
