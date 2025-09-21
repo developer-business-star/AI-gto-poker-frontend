@@ -4,7 +4,7 @@ import { ThemedView } from '@/components/ThemedView';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
-import { ScrollView, StyleSheet, Switch, Text, TouchableOpacity, View } from 'react-native';
+import { ScrollView, StyleSheet, Switch, Text, TouchableOpacity, View, Modal, ActivityIndicator, Alert, Platform, Clipboard } from 'react-native';
 import { useAuth } from '@/contexts/AuthContext';
 import { useTheme } from '@/contexts/ThemeContext';
 import { useHaptic } from '@/contexts/HapticContext';
@@ -18,6 +18,8 @@ import FocusAreasModal from '@/components/FocusAreasModal';
 import ClearCacheModal from '@/components/ClearCacheModal';
 import { useUserStats } from '@/hooks/useUserStats';
 import { API_CONFIG } from '@/config/api';
+import * as FileSystem from 'expo-file-system';
+import * as Sharing from 'expo-sharing';
 import React, { useState, useEffect } from 'react';
 
 interface ComprehensiveStats {
@@ -60,6 +62,8 @@ export default function ProfileScreen() {
   const [sessionLengthModalVisible, setSessionLengthModalVisible] = React.useState(false);
   const [focusAreasModalVisible, setFocusAreasModalVisible] = React.useState(false);
   const [clearCacheModalVisible, setClearCacheModalVisible] = React.useState(false);
+  const [privacyPolicyModalVisible, setPrivacyPolicyModalVisible] = React.useState(false);
+  const [exportingData, setExportingData] = React.useState(false);
   const router = useRouter();
   const { hapticEnabled, toggleHaptic, triggerHaptic } = useHaptic();
   const { selectedFormat, setSelectedFormat, formatDisplayName, selectedStackSize, setSelectedStackSize, stackSizeDisplayName, selectedAnalysisSpeed, setSelectedAnalysisSpeed, analysisSpeedDisplayName, selectedDifficultyLevel, setSelectedDifficultyLevel, difficultyLevelDisplayName, selectedSessionLength, setSelectedSessionLength, sessionLengthDisplayName, sessionDurationMinutes, selectedFocusAreas, setSelectedFocusAreas, focusAreasDisplayName } = useGame();
@@ -218,6 +222,209 @@ export default function ProfileScreen() {
     setClearCacheModalVisible(true);
   };
 
+  const handleExportHandHistory = async () => {
+    triggerHaptic('light');
+    setExportingData(true);
+    
+    try {
+      console.log('📤 Starting hand history export...');
+      
+      // Fetch analysis history from backend
+      let analysisHistory = [];
+      try {
+        const response = await fetch(`${API_CONFIG.BASE_URL}/api/analysis/history?limit=100`, {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+        });
+        
+        if (response.ok) {
+          const data = await response.json();
+          analysisHistory = data.analyses || [];
+        }
+      } catch (error) {
+        console.log('Could not fetch analysis history:', error);
+      }
+
+      // Create comprehensive export data
+      const exportData = {
+        user: {
+          id: user?.id,
+          email: user?.email,
+          exportDate: new Date().toISOString(),
+        },
+        handHistory: analysisHistory,
+        sessionData: {
+          recentSessionCash: (user as any)?.recentSessionCash,
+          recentSessionSpinAndGo: (user as any)?.recentSessionSpinAndGo,
+        },
+        gamePreferences: {
+          defaultGameType: selectedFormat,
+          stackSize: selectedStackSize,
+          analysisSpeed: selectedAnalysisSpeed,
+          difficultyLevel: selectedDifficultyLevel,
+          sessionLength: selectedSessionLength,
+          focusAreas: selectedFocusAreas,
+        },
+        performanceStats: comprehensiveStats,
+        metadata: {
+          appVersion: '1.0.0',
+          platform: Platform.OS,
+          exportTimestamp: Date.now(),
+        }
+      };
+
+      // Format data for export
+      const formatDataForExport = () => {
+        let content = '';
+        content += '='.repeat(60) + '\n';
+        content += 'GTO POKER ASSISTANT - HAND HISTORY & DATA EXPORT\n';
+        content += '='.repeat(60) + '\n\n';
+        
+        content += `Export Date: ${new Date().toLocaleString()}\n`;
+        content += `User: ${user?.email || 'Unknown'}\n`;
+        content += `Platform: ${Platform.OS}\n\n`;
+        
+        // Game Preferences
+        content += '📋 GAME PREFERENCES\n';
+        content += '-'.repeat(30) + '\n';
+        content += `Default Game Type: ${formatDisplayName}\n`;
+        content += `Stack Size: ${stackSizeDisplayName}\n`;
+        content += `Analysis Speed: ${analysisSpeedDisplayName}\n`;
+        content += `Difficulty Level: ${difficultyLevelDisplayName}\n`;
+        content += `Session Length: ${sessionLengthDisplayName}\n`;
+        content += `Focus Areas: ${focusAreasDisplayName}\n\n`;
+        
+        // Performance Stats
+        if (comprehensiveStats) {
+          content += '📊 PERFORMANCE STATISTICS\n';
+          content += '-'.repeat(30) + '\n';
+          content += `Overall Accuracy: ${comprehensiveStats.overallAccuracy?.toFixed(1)}%\n`;
+          content += `Accuracy Change: ${comprehensiveStats.accuracyChange > 0 ? '+' : ''}${comprehensiveStats.accuracyChange?.toFixed(1)}%\n`;
+          content += `Hands Played: ${comprehensiveStats.handsPlayed || 0}\n`;
+          content += `Sessions Played: ${(comprehensiveStats as any).sessionsPlayed || 0}\n\n`;
+          
+          // Recent Sessions
+          if (comprehensiveStats.recentSessions && comprehensiveStats.recentSessions.length > 0) {
+            content += '📈 RECENT SESSIONS\n';
+            content += '-'.repeat(30) + '\n';
+            comprehensiveStats.recentSessions.forEach((session, index) => {
+              content += `Session ${index + 1}:\n`;
+              content += `  Date: ${new Date(session.date).toLocaleDateString()}\n`;
+              content += `  Pot: ${(session as any).gamePot || 'N/A'}\n`;
+              content += `  Action: ${session.recommendedAction || 'N/A'}\n`;
+              content += `  Result: ${session.result || 'N/A'}\n\n`;
+            });
+          }
+        }
+        
+        // Hand History
+        if (analysisHistory.length > 0) {
+          content += '🃏 ANALYSIS HISTORY\n';
+          content += '-'.repeat(30) + '\n';
+          content += `Total Analyses: ${analysisHistory.length}\n\n`;
+          
+          analysisHistory.forEach((analysis: any, index: number) => {
+            content += `Analysis ${index + 1}:\n`;
+            content += `  Date: ${new Date(analysis.createdAt).toLocaleString()}\n`;
+            content += `  Game Format: ${analysis.gameFormat || 'Unknown'}\n`;
+            content += `  Pot: ${analysis.pot || 'N/A'}\n`;
+            content += `  Recommended Action: ${analysis.recommendedAction || 'N/A'}\n`;
+            content += `  Confidence: ${analysis.confidence || 'N/A'}\n`;
+            if (analysis.analysisNotes) {
+              content += `  Notes: ${analysis.analysisNotes}\n`;
+            }
+            content += '\n';
+          });
+        } else {
+          content += '🃏 ANALYSIS HISTORY\n';
+          content += '-'.repeat(30) + '\n';
+          content += 'No analysis history found.\n\n';
+        }
+        
+        content += '='.repeat(60) + '\n';
+        content += 'End of Export\n';
+        content += '='.repeat(60) + '\n';
+        
+        return content;
+      };
+
+      const documentContent = formatDataForExport();
+      const timestamp = new Date().toISOString().slice(0, 19).replace(/[:.]/g, '-');
+      const filename = `GTO_Hand_History_${timestamp}.txt`;
+      
+      // Try to share using file system
+      try {
+        const isAvailable = await Sharing.isAvailableAsync();
+        
+        if (isAvailable) {
+          try {
+            const tempDir = (FileSystem as any).cacheDirectory || (FileSystem as any).documentDirectory;
+            if (tempDir) {
+              const fileUri = tempDir + filename;
+              
+              await FileSystem.writeAsStringAsync(fileUri, documentContent);
+              
+              await Sharing.shareAsync(fileUri, {
+                mimeType: 'text/plain',
+                dialogTitle: 'Export Hand History',
+              });
+              
+              Alert.alert(
+                'Export Successful',
+                'Your hand history and game data has been exported and is ready to share!',
+                [{ text: 'OK' }]
+              );
+            } else {
+              throw new Error('No file system directory available');
+            }
+          } catch (fileError) {
+            // Fallback to data URI
+            const dataUri = `data:text/plain;charset=utf-8,${encodeURIComponent(documentContent)}`;
+            await Sharing.shareAsync(dataUri, {
+              mimeType: 'text/plain',
+              dialogTitle: 'Export Hand History',
+            });
+            
+            Alert.alert(
+              'Export Successful',
+              'Your hand history data has been shared!',
+              [{ text: 'OK' }]
+            );
+          }
+        } else {
+          throw new Error('Sharing not available');
+        }
+      } catch (error) {
+        console.log('Sharing not available, using clipboard fallback');
+        
+        // Fallback to clipboard
+        await (Clipboard as any).setStringAsync(documentContent);
+        Alert.alert(
+          'Export Complete',
+          'Your hand history data has been copied to the clipboard. You can paste it into any text app to save or share.',
+          [{ text: 'OK' }]
+        );
+      }
+      
+    } catch (error) {
+      console.error('Export error:', error);
+      Alert.alert(
+        'Export Failed',
+        'There was an error exporting your data. Please try again.',
+        [{ text: 'OK' }]
+      );
+    } finally {
+      setExportingData(false);
+    }
+  };
+
+  const handlePrivacyPolicyPress = () => {
+    triggerHaptic('light');
+    setPrivacyPolicyModalVisible(true);
+  };
+
   const menuItems = [
     {
       title: t('profile.gamePreferences'),
@@ -268,9 +475,9 @@ export default function ProfileScreen() {
     {
       title: t('profile.dataPrivacy'),
       items: [
-        { label: t('profile.settings.exportHandHistory'), value: '', icon: 'share', onPress: undefined },
+        { label: t('profile.settings.exportHandHistory'), value: exportingData ? 'Exporting...' : '', icon: 'share', onPress: handleExportHandHistory },
         { label: t('profile.settings.clearCache'), value: '', icon: 'trash', onPress: handleClearCachePress },
-        { label: t('profile.settings.privacyPolicy'), value: '', icon: 'shield-checkmark', onPress: undefined },
+        { label: t('profile.settings.privacyPolicy'), value: '', icon: 'shield-checkmark', onPress: handlePrivacyPolicyPress },
       ]
     }
   ];
@@ -610,6 +817,240 @@ export default function ProfileScreen() {
         visible={clearCacheModalVisible}
         onClose={() => setClearCacheModalVisible(false)}
       />
+
+      {/* Privacy Policy Modal */}
+      <Modal
+        visible={privacyPolicyModalVisible}
+        transparent={false}
+        animationType="slide"
+        onRequestClose={() => setPrivacyPolicyModalVisible(false)}
+      >
+        <View style={[styles.privacyModalFullScreen, { backgroundColor: isDark ? '#000000' : '#ffffff' }]}>
+          {/* Header */}
+          <View style={[styles.privacyModalHeader, { 
+            backgroundColor: isDark ? '#1c1c1e' : '#f8f9fa',
+            borderBottomColor: isDark ? '#38383a' : '#e1e5e9' 
+          }]}>
+            <Text style={[styles.privacyModalTitle, { color: isDark ? '#ffffff' : '#000000' }]}>
+              Privacy Policy
+            </Text>
+            <TouchableOpacity
+              style={[styles.privacyModalCloseButton, { backgroundColor: isDark ? '#2c2c2e' : '#e9ecef' }]}
+              onPress={() => setPrivacyPolicyModalVisible(false)}
+              activeOpacity={0.7}
+            >
+              <Ionicons name="close" size={20} color={isDark ? '#ffffff' : '#000000'} />
+            </TouchableOpacity>
+          </View>
+          
+          {/* Content */}
+          <ScrollView 
+            style={styles.privacyModalScrollContainer}
+            contentContainerStyle={styles.privacyModalScrollContent}
+            showsVerticalScrollIndicator={true}
+          >
+            {/* Data Collection Section */}
+            <View style={styles.privacySection}>
+              <Text style={[styles.privacySectionTitle, { color: '#007AFF' }]}>
+                📊 Data Collection
+              </Text>
+              <Text style={[styles.privacyText, { color: isDark ? '#ffffff' : '#000000' }]}>
+                We collect and process the following types of data to provide you with the best GTO poker analysis experience:
+              </Text>
+              
+              <View style={styles.privacyBulletContainer}>
+                <Text style={[styles.privacyBullet, { color: isDark ? '#ffffff' : '#000000' }]}>•</Text>
+                <Text style={[styles.privacyBulletText, { color: isDark ? '#ffffff' : '#000000' }]}>
+                  <Text style={styles.privacyBold}>Poker Hand Analysis Data:</Text> Images you upload for analysis, game states, pot sizes, and recommended actions
+                </Text>
+              </View>
+              
+              <View style={styles.privacyBulletContainer}>
+                <Text style={[styles.privacyBullet, { color: isDark ? '#ffffff' : '#000000' }]}>•</Text>
+                <Text style={[styles.privacyBulletText, { color: isDark ? '#ffffff' : '#000000' }]}>
+                  <Text style={styles.privacyBold}>Performance Statistics:</Text> Your accuracy rates, session results, and training progress
+                </Text>
+              </View>
+              
+              <View style={styles.privacyBulletContainer}>
+                <Text style={[styles.privacyBullet, { color: isDark ? '#ffffff' : '#000000' }]}>•</Text>
+                <Text style={[styles.privacyBulletText, { color: isDark ? '#ffffff' : '#000000' }]}>
+                  <Text style={styles.privacyBold}>Game Preferences:</Text> Your selected game types, stack sizes, and training settings
+                </Text>
+              </View>
+              
+              <View style={styles.privacyBulletContainer}>
+                <Text style={[styles.privacyBullet, { color: isDark ? '#ffffff' : '#000000' }]}>•</Text>
+                <Text style={[styles.privacyBulletText, { color: isDark ? '#ffffff' : '#000000' }]}>
+                  <Text style={styles.privacyBold}>Account Information:</Text> Email address and authentication data
+                </Text>
+              </View>
+            </View>
+
+            {/* Data Usage Section */}
+            <View style={styles.privacySection}>
+              <Text style={[styles.privacySectionTitle, { color: '#007AFF' }]}>
+                🎯 Data Usage
+              </Text>
+              <Text style={[styles.privacyText, { color: isDark ? '#ffffff' : '#000000' }]}>
+                Your data is used exclusively to:
+              </Text>
+              
+              <View style={styles.privacyBulletContainer}>
+                <Text style={[styles.privacyBullet, { color: isDark ? '#ffffff' : '#000000' }]}>•</Text>
+                <Text style={[styles.privacyBulletText, { color: isDark ? '#ffffff' : '#000000' }]}>
+                  Provide accurate GTO poker analysis and recommendations
+                </Text>
+              </View>
+              
+              <View style={styles.privacyBulletContainer}>
+                <Text style={[styles.privacyBullet, { color: isDark ? '#ffffff' : '#000000' }]}>•</Text>
+                <Text style={[styles.privacyBulletText, { color: isDark ? '#ffffff' : '#000000' }]}>
+                  Track your performance and improvement over time
+                </Text>
+              </View>
+              
+              <View style={styles.privacyBulletContainer}>
+                <Text style={[styles.privacyBullet, { color: isDark ? '#ffffff' : '#000000' }]}>•</Text>
+                <Text style={[styles.privacyBulletText, { color: isDark ? '#ffffff' : '#000000' }]}>
+                  Personalize your training experience
+                </Text>
+              </View>
+              
+              <View style={styles.privacyBulletContainer}>
+                <Text style={[styles.privacyBullet, { color: isDark ? '#ffffff' : '#000000' }]}>•</Text>
+                <Text style={[styles.privacyBulletText, { color: isDark ? '#ffffff' : '#000000' }]}>
+                  Improve our analysis algorithms and app functionality
+                </Text>
+              </View>
+            </View>
+
+            {/* Security Section */}
+            <View style={styles.privacySection}>
+              <Text style={[styles.privacySectionTitle, { color: '#007AFF' }]}>
+                🔒 Data Storage & Security
+              </Text>
+              
+              <View style={styles.privacyBulletContainer}>
+                <Text style={[styles.privacyBullet, { color: isDark ? '#ffffff' : '#000000' }]}>•</Text>
+                <Text style={[styles.privacyBulletText, { color: isDark ? '#ffffff' : '#000000' }]}>
+                  All data is encrypted and stored securely on our servers
+                </Text>
+              </View>
+              
+              <View style={styles.privacyBulletContainer}>
+                <Text style={[styles.privacyBullet, { color: isDark ? '#ffffff' : '#000000' }]}>•</Text>
+                <Text style={[styles.privacyBulletText, { color: isDark ? '#ffffff' : '#000000' }]}>
+                  Hand analysis images are processed and then deleted within 24 hours
+                </Text>
+              </View>
+              
+              <View style={styles.privacyBulletContainer}>
+                <Text style={[styles.privacyBullet, { color: isDark ? '#ffffff' : '#000000' }]}>•</Text>
+                <Text style={[styles.privacyBulletText, { color: isDark ? '#ffffff' : '#000000' }]}>
+                  Performance data is retained to track your progress
+                </Text>
+              </View>
+              
+              <View style={styles.privacyBulletContainer}>
+                <Text style={[styles.privacyBullet, { color: isDark ? '#ffffff' : '#000000' }]}>•</Text>
+                <Text style={[styles.privacyBulletText, { color: isDark ? '#ffffff' : '#000000' }]}>
+                  We use industry-standard security measures to protect your information
+                </Text>
+              </View>
+            </View>
+
+            {/* Your Rights Section */}
+            <View style={styles.privacySection}>
+              <Text style={[styles.privacySectionTitle, { color: '#007AFF' }]}>
+                ⚖️ Your Rights
+              </Text>
+              <Text style={[styles.privacyText, { color: isDark ? '#ffffff' : '#000000' }]}>
+                You have the right to:
+              </Text>
+              
+              <View style={styles.privacyBulletContainer}>
+                <Text style={[styles.privacyBullet, { color: isDark ? '#ffffff' : '#000000' }]}>•</Text>
+                <Text style={[styles.privacyBulletText, { color: isDark ? '#ffffff' : '#000000' }]}>
+                  Export all your data using the "Export Hand History" feature
+                </Text>
+              </View>
+              
+              <View style={styles.privacyBulletContainer}>
+                <Text style={[styles.privacyBullet, { color: isDark ? '#ffffff' : '#000000' }]}>•</Text>
+                <Text style={[styles.privacyBulletText, { color: isDark ? '#ffffff' : '#000000' }]}>
+                  Request deletion of your account and all associated data
+                </Text>
+              </View>
+              
+              <View style={styles.privacyBulletContainer}>
+                <Text style={[styles.privacyBullet, { color: isDark ? '#ffffff' : '#000000' }]}>•</Text>
+                <Text style={[styles.privacyBulletText, { color: isDark ? '#ffffff' : '#000000' }]}>
+                  Access and review all data we have about you
+                </Text>
+              </View>
+              
+              <View style={styles.privacyBulletContainer}>
+                <Text style={[styles.privacyBullet, { color: isDark ? '#ffffff' : '#000000' }]}>•</Text>
+                <Text style={[styles.privacyBulletText, { color: isDark ? '#ffffff' : '#000000' }]}>
+                  Opt out of data collection (though this may limit app functionality)
+                </Text>
+              </View>
+            </View>
+
+            {/* Third Party Section */}
+            <View style={styles.privacySection}>
+              <Text style={[styles.privacySectionTitle, { color: '#007AFF' }]}>
+                🔗 Third-Party Services
+              </Text>
+              <Text style={[styles.privacyText, { color: isDark ? '#ffffff' : '#000000' }]}>
+                We use the following third-party services:
+              </Text>
+              
+              <View style={styles.privacyBulletContainer}>
+                <Text style={[styles.privacyBullet, { color: isDark ? '#ffffff' : '#000000' }]}>•</Text>
+                <Text style={[styles.privacyBulletText, { color: isDark ? '#ffffff' : '#000000' }]}>
+                  Authentication services for secure login
+                </Text>
+              </View>
+              
+              <View style={styles.privacyBulletContainer}>
+                <Text style={[styles.privacyBullet, { color: isDark ? '#ffffff' : '#000000' }]}>•</Text>
+                <Text style={[styles.privacyBulletText, { color: isDark ? '#ffffff' : '#000000' }]}>
+                  Cloud storage for data backup and synchronization
+                </Text>
+              </View>
+              
+              <View style={styles.privacyBulletContainer}>
+                <Text style={[styles.privacyBullet, { color: isDark ? '#ffffff' : '#000000' }]}>•</Text>
+                <Text style={[styles.privacyBulletText, { color: isDark ? '#ffffff' : '#000000' }]}>
+                  Analytics services to improve app performance (anonymized data only)
+                </Text>
+              </View>
+            </View>
+
+            {/* Contact Section */}
+            <View style={styles.privacySection}>
+              <Text style={[styles.privacySectionTitle, { color: '#007AFF' }]}>
+                📧 Contact Us
+              </Text>
+              <Text style={[styles.privacyText, { color: isDark ? '#ffffff' : '#000000' }]}>
+                For any privacy-related questions or requests, please contact us through the app's support feature or email us directly.
+              </Text>
+            </View>
+
+            {/* Footer */}
+            <View style={styles.privacyFooter}>
+              <Text style={[styles.privacyFooterText, { color: isDark ? '#8e8e93' : '#666666' }]}>
+                Last updated: {new Date().toLocaleDateString()}
+              </Text>
+              <Text style={[styles.privacyFooterText, { color: isDark ? '#8e8e93' : '#666666' }]}>
+                GTO Poker Assistant v1.0.0
+              </Text>
+            </View>
+          </ScrollView>
+        </View>
+      </Modal>
     </ThemedView>
   );
 }
@@ -857,5 +1298,83 @@ const styles = StyleSheet.create({
   loadingText: {
     fontSize: 18,
     color: '#666',
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  privacyModalFullScreen: {
+    flex: 1,
+  },
+  privacyModalHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 20,
+    paddingTop: Platform.OS === 'ios' ? 50 : 20,
+    paddingBottom: 15,
+    borderBottomWidth: 1,
+  },
+  privacyModalTitle: {
+    fontSize: 24,
+    fontWeight: '700',
+  },
+  privacyModalCloseButton: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  privacyModalScrollContainer: {
+    flex: 1,
+  },
+  privacyModalScrollContent: {
+    padding: 20,
+    paddingBottom: 40,
+  },
+  privacySection: {
+    marginBottom: 30,
+  },
+  privacySectionTitle: {
+    fontSize: 20,
+    fontWeight: '700',
+    marginBottom: 15,
+  },
+  privacyText: {
+    fontSize: 16,
+    lineHeight: 24,
+    marginBottom: 15,
+  },
+  privacyBulletContainer: {
+    flexDirection: 'row',
+    marginBottom: 10,
+    paddingRight: 5,
+  },
+  privacyBullet: {
+    fontSize: 16,
+    marginRight: 12,
+    marginTop: 2,
+    minWidth: 20,
+  },
+  privacyBulletText: {
+    fontSize: 16,
+    lineHeight: 24,
+    flex: 1,
+  },
+  privacyBold: {
+    fontWeight: '700',
+  },
+  privacyFooter: {
+    marginTop: 20,
+    paddingTop: 20,
+    alignItems: 'center',
+  },
+  privacyFooterText: {
+    fontSize: 14,
+    textAlign: 'center',
+    marginBottom: 5,
   },
 }); 

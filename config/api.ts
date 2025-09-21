@@ -34,7 +34,7 @@ export const DEV_CONFIG = {
 export const API_CONFIG = {
   // Backend server URL
   BASE_URL: getBaseUrl(),
-  // BASE_URL: `https://fd314ba77f0c.ngrok-free.app/api`,
+  // BASE_URL: `https://bb4c4ad182c9.ngrok-free.app/api`,
 
   // Request timeouts
   TIMEOUT: 30000, // 30 seconds
@@ -63,7 +63,7 @@ export const API_CONFIG = {
     PLATFORM: Platform.OS,
     IS_DEV: __DEV__,
     RESOLVED_URL: getBaseUrl(),
-    // RESOLVED_URL: `https://fd314ba77f0c.ngrok-free.app/api`,
+    // RESOLVED_URL: `https://bb4c4ad182c9.ngrok-free.app/api`,
   }
 };
 
