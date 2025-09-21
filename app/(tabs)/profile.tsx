@@ -1349,53 +1349,6 @@ Best regards`);
               <Ionicons name="chevron-forward" size={20} color={isDark ? '#8e8e93' : '#666666'} />
             </TouchableOpacity>
 
-            {/* Bug Report */}
-            <TouchableOpacity 
-              style={[styles.supportOption, { backgroundColor: isDark ? '#1c1c1e' : '#f8f9fa', borderColor: isDark ? '#38383a' : '#e1e5e9' }]}
-              onPress={() => {
-                const subject = encodeURIComponent('Bug Report - GTO Poker Assistant');
-                const body = encodeURIComponent(`Bug Report
-
-Device: ${Platform.OS}
-App Version: 1.0.0
-User: ${user?.email || 'Unknown'}
-Date: ${new Date().toLocaleString()}
-
-Steps to reproduce:
-1. 
-2. 
-3. 
-
-Expected behavior:
-
-
-Actual behavior:
-
-
-Additional notes:
-
-
-`);
-                Linking.openURL(`mailto:bugs@gtopokerassistant.com?subject=${subject}&body=${body}`);
-              }}
-            >
-              <View style={styles.supportOptionIcon}>
-                <Ionicons name="bug" size={32} color="#ff6b6b" />
-              </View>
-              <View style={styles.supportOptionContent}>
-                <Text style={[styles.supportOptionTitle, { color: isDark ? '#ffffff' : '#000000' }]}>
-                  Report a Bug
-                </Text>
-                <Text style={[styles.supportOptionDescription, { color: isDark ? '#d1d1d6' : '#666666' }]}>
-                  Found a problem? Help us improve by reporting bugs.
-                </Text>
-                <Text style={[styles.supportOptionDetail, { color: '#ff6b6b' }]}>
-                  bugs@gtopokerassistant.com
-                </Text>
-              </View>
-              <Ionicons name="chevron-forward" size={20} color={isDark ? '#8e8e93' : '#666666'} />
-            </TouchableOpacity>
-
             {/* Feature Request */}
             <TouchableOpacity 
               style={[styles.supportOption, { backgroundColor: isDark ? '#1c1c1e' : '#f8f9fa', borderColor: isDark ? '#38383a' : '#e1e5e9' }]}
