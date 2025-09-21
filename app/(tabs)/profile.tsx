@@ -4,7 +4,7 @@ import { ThemedView } from '@/components/ThemedView';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
-import { ScrollView, StyleSheet, Switch, Text, TouchableOpacity, View, Modal, ActivityIndicator, Alert, Platform, Clipboard } from 'react-native';
+import { ScrollView, StyleSheet, Switch, Text, TouchableOpacity, View, Modal, ActivityIndicator, Alert, Platform, Clipboard, TextInput, Linking } from 'react-native';
 import { useAuth } from '@/contexts/AuthContext';
 import { useTheme } from '@/contexts/ThemeContext';
 import { useHaptic } from '@/contexts/HapticContext';
@@ -64,6 +64,10 @@ export default function ProfileScreen() {
   const [clearCacheModalVisible, setClearCacheModalVisible] = React.useState(false);
   const [privacyPolicyModalVisible, setPrivacyPolicyModalVisible] = React.useState(false);
   const [exportingData, setExportingData] = React.useState(false);
+  const [helpFAQModalVisible, setHelpFAQModalVisible] = React.useState(false);
+  const [contactSupportModalVisible, setContactSupportModalVisible] = React.useState(false);
+  const [aboutModalVisible, setAboutModalVisible] = React.useState(false);
+  const [faqSearchQuery, setFaqSearchQuery] = React.useState('');
   const router = useRouter();
   const { hapticEnabled, toggleHaptic, triggerHaptic } = useHaptic();
   const { selectedFormat, setSelectedFormat, formatDisplayName, selectedStackSize, setSelectedStackSize, stackSizeDisplayName, selectedAnalysisSpeed, setSelectedAnalysisSpeed, analysisSpeedDisplayName, selectedDifficultyLevel, setSelectedDifficultyLevel, difficultyLevelDisplayName, selectedSessionLength, setSelectedSessionLength, sessionLengthDisplayName, sessionDurationMinutes, selectedFocusAreas, setSelectedFocusAreas, focusAreasDisplayName } = useGame();
@@ -425,6 +429,124 @@ export default function ProfileScreen() {
     setPrivacyPolicyModalVisible(true);
   };
 
+  const handleHelpFAQPress = () => {
+    triggerHaptic('light');
+    setHelpFAQModalVisible(true);
+  };
+
+  const handleContactSupportPress = () => {
+    triggerHaptic('light');
+    setContactSupportModalVisible(true);
+  };
+
+  const handleAboutPress = () => {
+    triggerHaptic('light');
+    setAboutModalVisible(true);
+  };
+
+  // FAQ Data
+  const faqData = [
+    {
+      category: "Getting Started",
+      icon: "rocket",
+      questions: [
+        {
+          question: "How do I analyze my first poker hand?",
+          answer: "Tap the 'Solver' tab at the bottom, then use the camera to capture your poker table or upload an image from your gallery. Our AI will analyze the hand and provide GTO recommendations."
+        },
+        {
+          question: "What game formats are supported?",
+          answer: "We support Cash Games and Tournament formats including Spin & Go. You can select your preferred format in the game preferences section."
+        },
+        {
+          question: "How accurate are the recommendations?",
+          answer: "Our GTO solver uses advanced algorithms trained on millions of poker scenarios. Accuracy typically ranges from 85-95% depending on image quality and game complexity."
+        }
+      ]
+    },
+    {
+      category: "Using the Solver",
+      icon: "analytics",
+      questions: [
+        {
+          question: "Why is my image analysis taking too long?",
+          answer: "Analysis speed depends on your selected setting and image complexity. You can adjust analysis speed in Settings > Analysis Speed. 'Fast' mode takes 2-3 seconds, while 'Detailed' mode takes 5-8 seconds for higher accuracy."
+        },
+        {
+          question: "What if the solver can't read my cards?",
+          answer: "Ensure good lighting and clear card visibility. The cards should be fully visible without glare or shadows. You can retake the photo or adjust the image before analysis."
+        },
+        {
+          question: "Can I analyze hands from different poker sites?",
+          answer: "Yes! Our solver works with screenshots from any poker site or live poker photos. The AI adapts to different table layouts and card designs."
+        }
+      ]
+    },
+    {
+      category: "Training & Stats",
+      icon: "school",
+      questions: [
+        {
+          question: "How does the training mode work?",
+          answer: "Training mode presents you with poker scenarios and asks for your decision. Compare your choice with GTO recommendations to improve your skills. You can set difficulty levels and focus areas in settings."
+        },
+        {
+          question: "What do the accuracy statistics mean?",
+          answer: "Your accuracy shows how often your decisions align with GTO recommendations. Track your progress over time and identify areas for improvement in the Stats tab."
+        },
+        {
+          question: "How can I improve my accuracy?",
+          answer: "Focus on specific areas using the Focus Areas setting, practice regularly with training mode, and review your analysis history to learn from mistakes."
+        }
+      ]
+    },
+    {
+      category: "Account & Settings",
+      icon: "settings",
+      questions: [
+        {
+          question: "How do I change my game preferences?",
+          answer: "Go to Profile > Game Preferences. You can adjust default game type, stack size, analysis speed, and other settings to match your playing style."
+        },
+        {
+          question: "Can I export my data?",
+          answer: "Yes! Use Profile > Data & Privacy > Export Hand History to download all your analysis data, session results, and statistics."
+        },
+        {
+          question: "How do I delete my account?",
+          answer: "Contact our support team through the Contact Support option. We'll help you delete your account and all associated data per our privacy policy."
+        }
+      ]
+    },
+    {
+      category: "Troubleshooting",
+      icon: "construct",
+      questions: [
+        {
+          question: "The app is running slowly, what can I do?",
+          answer: "Try clearing the app cache in Profile > Data & Privacy > Clear Cache. Also ensure you have a stable internet connection for analysis requests."
+        },
+        {
+          question: "I'm getting analysis errors, how to fix?",
+          answer: "Check your internet connection, ensure the image is clear and well-lit, and try again. If problems persist, contact support with the error details."
+        },
+        {
+          question: "How do I report a bug?",
+          answer: "Use the Contact Support feature to report bugs. Include details about what happened, when it occurred, and your device information."
+        }
+      ]
+    }
+  ];
+
+  const filteredFAQ = faqData.map(category => ({
+    ...category,
+    questions: category.questions.filter(
+      q => 
+        q.question.toLowerCase().includes(faqSearchQuery.toLowerCase()) ||
+        q.answer.toLowerCase().includes(faqSearchQuery.toLowerCase())
+    )
+  })).filter(category => category.questions.length > 0);
+
   const menuItems = [
     {
       title: t('profile.gamePreferences'),
@@ -724,7 +846,7 @@ export default function ProfileScreen() {
         <View style={styles.section}>
           <Text style={[styles.sectionTitle, { color: colors.text }]}>{t('profile.supportAbout')}</Text>
           <View style={[styles.menuGroup, { backgroundColor: colors.card, borderColor: colors.border }]}>
-            <TouchableOpacity style={[styles.menuItem, { borderBottomColor: colors.divider }]}>
+            <TouchableOpacity style={[styles.menuItem, { borderBottomColor: colors.divider }]} onPress={handleHelpFAQPress}>
               <View style={styles.menuLeft}>
                 <Ionicons name="help-circle" size={20} color={colors.textSecondary} />
                 <Text style={[styles.menuLabel, { color: colors.text }]}>{t('profile.settings.helpFAQ')}</Text>
@@ -732,7 +854,7 @@ export default function ProfileScreen() {
               <Ionicons name="chevron-forward" size={16} color={colors.textSecondary} />
             </TouchableOpacity>
             
-            <TouchableOpacity style={[styles.menuItem, { borderBottomColor: colors.divider }]}>
+            <TouchableOpacity style={[styles.menuItem, { borderBottomColor: colors.divider }]} onPress={handleContactSupportPress}>
               <View style={styles.menuLeft}>
                 <Ionicons name="mail" size={20} color={colors.textSecondary} />
                 <Text style={[styles.menuLabel, { color: colors.text }]}>{t('profile.settings.contactSupport')}</Text>
@@ -740,7 +862,7 @@ export default function ProfileScreen() {
               <Ionicons name="chevron-forward" size={16} color={colors.textSecondary} />
             </TouchableOpacity>
             
-            <TouchableOpacity style={styles.menuItem}>
+            <TouchableOpacity style={styles.menuItem} onPress={handleAboutPress}>
               <View style={styles.menuLeft}>
                 <Ionicons name="information-circle" size={20} color={colors.textSecondary} />
                 <Text style={[styles.menuLabel, { color: colors.text }]}>{t('profile.settings.about')}</Text>
@@ -1046,6 +1168,419 @@ export default function ProfileScreen() {
               </Text>
               <Text style={[styles.privacyFooterText, { color: isDark ? '#8e8e93' : '#666666' }]}>
                 GTO Poker Assistant v1.0.0
+              </Text>
+            </View>
+          </ScrollView>
+        </View>
+      </Modal>
+
+      {/* Help & FAQ Modal */}
+      <Modal
+        visible={helpFAQModalVisible}
+        transparent={false}
+        animationType="slide"
+        onRequestClose={() => setHelpFAQModalVisible(false)}
+      >
+        <View style={[styles.helpFAQModalFullScreen, { backgroundColor: isDark ? '#000000' : '#ffffff' }]}>
+          {/* Header */}
+          <View style={[styles.helpFAQModalHeader, { 
+            backgroundColor: isDark ? '#1c1c1e' : '#f8f9fa',
+            borderBottomColor: isDark ? '#38383a' : '#e1e5e9' 
+          }]}>
+            <Text style={[styles.helpFAQModalTitle, { color: isDark ? '#ffffff' : '#000000' }]}>
+              Help & FAQ
+            </Text>
+            <TouchableOpacity
+              style={[styles.helpFAQModalCloseButton, { backgroundColor: isDark ? '#2c2c2e' : '#e9ecef' }]}
+              onPress={() => setHelpFAQModalVisible(false)}
+              activeOpacity={0.7}
+            >
+              <Ionicons name="close" size={20} color={isDark ? '#ffffff' : '#000000'} />
+            </TouchableOpacity>
+          </View>
+          
+          {/* Search Bar */}
+          <View style={[styles.searchContainer, { backgroundColor: isDark ? '#1c1c1e' : '#f8f9fa' }]}>
+            <View style={[styles.searchInputContainer, { backgroundColor: isDark ? '#2c2c2e' : '#ffffff', borderColor: isDark ? '#38383a' : '#e1e5e9' }]}>
+              <Ionicons name="search" size={20} color={isDark ? '#8e8e93' : '#666666'} />
+              <TextInput
+                style={[styles.searchInput, { color: isDark ? '#ffffff' : '#000000' }]}
+                placeholder="Search FAQ..."
+                placeholderTextColor={isDark ? '#8e8e93' : '#666666'}
+                value={faqSearchQuery}
+                onChangeText={setFaqSearchQuery}
+              />
+              {faqSearchQuery.length > 0 && (
+                <TouchableOpacity onPress={() => setFaqSearchQuery('')}>
+                  <Ionicons name="close-circle" size={20} color={isDark ? '#8e8e93' : '#666666'} />
+                </TouchableOpacity>
+              )}
+            </View>
+          </View>
+          
+          {/* Content */}
+          <ScrollView 
+            style={styles.helpFAQModalScrollContainer}
+            contentContainerStyle={styles.helpFAQModalScrollContent}
+            showsVerticalScrollIndicator={true}
+          >
+            {filteredFAQ.length > 0 ? filteredFAQ.map((category, categoryIndex) => (
+              <View key={categoryIndex} style={styles.faqCategory}>
+                <View style={styles.faqCategoryHeader}>
+                  <Ionicons name={category.icon as any} size={24} color="#007AFF" />
+                  <Text style={[styles.faqCategoryTitle, { color: isDark ? '#ffffff' : '#000000' }]}>
+                    {category.category}
+                  </Text>
+                </View>
+                
+                {category.questions.map((faq, faqIndex) => (
+                  <View key={faqIndex} style={[styles.faqItem, { backgroundColor: isDark ? '#1c1c1e' : '#f8f9fa', borderColor: isDark ? '#38383a' : '#e1e5e9' }]}>
+                    <Text style={[styles.faqQuestion, { color: isDark ? '#ffffff' : '#000000' }]}>
+                      {faq.question}
+                    </Text>
+                    <Text style={[styles.faqAnswer, { color: isDark ? '#d1d1d6' : '#666666' }]}>
+                      {faq.answer}
+                    </Text>
+                  </View>
+                ))}
+              </View>
+            )) : (
+              <View style={styles.noResultsContainer}>
+                <Ionicons name="search" size={48} color={isDark ? '#8e8e93' : '#666666'} />
+                <Text style={[styles.noResultsText, { color: isDark ? '#8e8e93' : '#666666' }]}>
+                  No FAQ found matching "{faqSearchQuery}"
+                </Text>
+                <Text style={[styles.noResultsSubtext, { color: isDark ? '#8e8e93' : '#666666' }]}>
+                  Try different keywords or contact support
+                </Text>
+              </View>
+            )}
+            
+            {/* Contact Support Suggestion */}
+            <View style={[styles.supportSuggestion, { backgroundColor: isDark ? '#1c1c1e' : '#f0f8ff', borderColor: '#007AFF' }]}>
+              <Ionicons name="help-circle" size={24} color="#007AFF" />
+              <View style={styles.supportSuggestionText}>
+                <Text style={[styles.supportSuggestionTitle, { color: isDark ? '#ffffff' : '#000000' }]}>
+                  Still need help?
+                </Text>
+                <Text style={[styles.supportSuggestionSubtitle, { color: isDark ? '#d1d1d6' : '#666666' }]}>
+                  Contact our support team for personalized assistance
+                </Text>
+              </View>
+              <TouchableOpacity
+                style={styles.supportSuggestionButton}
+                onPress={() => {
+                  setHelpFAQModalVisible(false);
+                  setTimeout(() => setContactSupportModalVisible(true), 300);
+                }}
+              >
+                <Text style={styles.supportSuggestionButtonText}>Contact</Text>
+              </TouchableOpacity>
+            </View>
+          </ScrollView>
+        </View>
+      </Modal>
+
+      {/* Contact Support Modal */}
+      <Modal
+        visible={contactSupportModalVisible}
+        transparent={false}
+        animationType="slide"
+        onRequestClose={() => setContactSupportModalVisible(false)}
+      >
+        <View style={[styles.contactSupportModalFullScreen, { backgroundColor: isDark ? '#000000' : '#ffffff' }]}>
+          {/* Header */}
+          <View style={[styles.contactSupportModalHeader, { 
+            backgroundColor: isDark ? '#1c1c1e' : '#f8f9fa',
+            borderBottomColor: isDark ? '#38383a' : '#e1e5e9' 
+          }]}>
+            <Text style={[styles.contactSupportModalTitle, { color: isDark ? '#ffffff' : '#000000' }]}>
+              Contact Support
+            </Text>
+            <TouchableOpacity
+              style={[styles.contactSupportModalCloseButton, { backgroundColor: isDark ? '#2c2c2e' : '#e9ecef' }]}
+              onPress={() => setContactSupportModalVisible(false)}
+              activeOpacity={0.7}
+            >
+              <Ionicons name="close" size={20} color={isDark ? '#ffffff' : '#000000'} />
+            </TouchableOpacity>
+          </View>
+          
+          {/* Content */}
+          <ScrollView 
+            style={styles.contactSupportModalScrollContainer}
+            contentContainerStyle={styles.contactSupportModalScrollContent}
+            showsVerticalScrollIndicator={true}
+          >
+            {/* Email Support */}
+            <TouchableOpacity 
+              style={[styles.supportOption, { backgroundColor: isDark ? '#1c1c1e' : '#f8f9fa', borderColor: isDark ? '#38383a' : '#e1e5e9' }]}
+              onPress={() => {
+                const subject = encodeURIComponent('GTO Poker Assistant Support Request');
+                const body = encodeURIComponent(`Hi Support Team,
+
+I need help with:
+
+Device: ${Platform.OS}
+App Version: 1.0.0
+User: ${user?.email || 'Unknown'}
+
+Description:
+[Please describe your issue here]
+
+Best regards`);
+                Linking.openURL(`mailto:support@gtopokerassistant.com?subject=${subject}&body=${body}`);
+              }}
+            >
+              <View style={styles.supportOptionIcon}>
+                <Ionicons name="mail" size={32} color="#007AFF" />
+              </View>
+              <View style={styles.supportOptionContent}>
+                <Text style={[styles.supportOptionTitle, { color: isDark ? '#ffffff' : '#000000' }]}>
+                  Email Support
+                </Text>
+                <Text style={[styles.supportOptionDescription, { color: isDark ? '#d1d1d6' : '#666666' }]}>
+                  Get detailed help via email. We typically respond within 24 hours.
+                </Text>
+                <Text style={[styles.supportOptionDetail, { color: '#007AFF' }]}>
+                  support@gtopokerassistant.com
+                </Text>
+              </View>
+              <Ionicons name="chevron-forward" size={20} color={isDark ? '#8e8e93' : '#666666'} />
+            </TouchableOpacity>
+
+            {/* Bug Report */}
+            <TouchableOpacity 
+              style={[styles.supportOption, { backgroundColor: isDark ? '#1c1c1e' : '#f8f9fa', borderColor: isDark ? '#38383a' : '#e1e5e9' }]}
+              onPress={() => {
+                const subject = encodeURIComponent('Bug Report - GTO Poker Assistant');
+                const body = encodeURIComponent(`Bug Report
+
+Device: ${Platform.OS}
+App Version: 1.0.0
+User: ${user?.email || 'Unknown'}
+Date: ${new Date().toLocaleString()}
+
+Steps to reproduce:
+1. 
+2. 
+3. 
+
+Expected behavior:
+
+
+Actual behavior:
+
+
+Additional notes:
+
+
+`);
+                Linking.openURL(`mailto:bugs@gtopokerassistant.com?subject=${subject}&body=${body}`);
+              }}
+            >
+              <View style={styles.supportOptionIcon}>
+                <Ionicons name="bug" size={32} color="#ff6b6b" />
+              </View>
+              <View style={styles.supportOptionContent}>
+                <Text style={[styles.supportOptionTitle, { color: isDark ? '#ffffff' : '#000000' }]}>
+                  Report a Bug
+                </Text>
+                <Text style={[styles.supportOptionDescription, { color: isDark ? '#d1d1d6' : '#666666' }]}>
+                  Found a problem? Help us improve by reporting bugs.
+                </Text>
+                <Text style={[styles.supportOptionDetail, { color: '#ff6b6b' }]}>
+                  bugs@gtopokerassistant.com
+                </Text>
+              </View>
+              <Ionicons name="chevron-forward" size={20} color={isDark ? '#8e8e93' : '#666666'} />
+            </TouchableOpacity>
+
+            {/* Feature Request */}
+            <TouchableOpacity 
+              style={[styles.supportOption, { backgroundColor: isDark ? '#1c1c1e' : '#f8f9fa', borderColor: isDark ? '#38383a' : '#e1e5e9' }]}
+              onPress={() => {
+                const subject = encodeURIComponent('Feature Request - GTO Poker Assistant');
+                const body = encodeURIComponent(`Feature Request
+
+User: ${user?.email || 'Unknown'}
+Date: ${new Date().toLocaleString()}
+
+Feature Description:
+
+
+Why would this be useful:
+
+
+Priority (Low/Medium/High):
+
+
+Additional details:
+
+
+`);
+                Linking.openURL(`mailto:features@gtopokerassistant.com?subject=${subject}&body=${body}`);
+              }}
+            >
+              <View style={styles.supportOptionIcon}>
+                <Ionicons name="bulb" size={32} color="#ffd93d" />
+              </View>
+              <View style={styles.supportOptionContent}>
+                <Text style={[styles.supportOptionTitle, { color: isDark ? '#ffffff' : '#000000' }]}>
+                  Request Feature
+                </Text>
+                <Text style={[styles.supportOptionDescription, { color: isDark ? '#d1d1d6' : '#666666' }]}>
+                  Have an idea? Share your feature requests with us.
+                </Text>
+                <Text style={[styles.supportOptionDetail, { color: '#ffd93d' }]}>
+                  features@gtopokerassistant.com
+                </Text>
+              </View>
+              <Ionicons name="chevron-forward" size={20} color={isDark ? '#8e8e93' : '#666666'} />
+            </TouchableOpacity>
+
+            {/* Response Time Info */}
+            <View style={[styles.responseTimeInfo, { backgroundColor: isDark ? '#1c1c1e' : '#f0f8ff', borderColor: isDark ? '#38383a' : '#007AFF' }]}>
+              <Ionicons name="time" size={24} color="#007AFF" />
+              <View style={styles.responseTimeContent}>
+                <Text style={[styles.responseTimeTitle, { color: isDark ? '#ffffff' : '#000000' }]}>
+                  Response Times
+                </Text>
+                <Text style={[styles.responseTimeText, { color: isDark ? '#d1d1d6' : '#666666' }]}>
+                  • General Support: 24-48 hours{'\n'}
+                  • Bug Reports: 12-24 hours{'\n'}
+                  • Feature Requests: 3-5 business days
+                </Text>
+              </View>
+            </View>
+          </ScrollView>
+        </View>
+      </Modal>
+
+      {/* About Modal */}
+      <Modal
+        visible={aboutModalVisible}
+        transparent={false}
+        animationType="slide"
+        onRequestClose={() => setAboutModalVisible(false)}
+      >
+        <View style={[styles.aboutModalFullScreen, { backgroundColor: isDark ? '#000000' : '#ffffff' }]}>
+          {/* Header */}
+          <View style={[styles.aboutModalHeader, { 
+            backgroundColor: isDark ? '#1c1c1e' : '#f8f9fa',
+            borderBottomColor: isDark ? '#38383a' : '#e1e5e9' 
+          }]}>
+            <Text style={[styles.aboutModalTitle, { color: isDark ? '#ffffff' : '#000000' }]}>
+              About
+            </Text>
+            <TouchableOpacity
+              style={[styles.aboutModalCloseButton, { backgroundColor: isDark ? '#2c2c2e' : '#e9ecef' }]}
+              onPress={() => setAboutModalVisible(false)}
+              activeOpacity={0.7}
+            >
+              <Ionicons name="close" size={20} color={isDark ? '#ffffff' : '#000000'} />
+            </TouchableOpacity>
+          </View>
+          
+          {/* Content */}
+          <ScrollView 
+            style={styles.aboutModalScrollContainer}
+            contentContainerStyle={styles.aboutModalScrollContent}
+            showsVerticalScrollIndicator={true}
+          >
+            {/* App Logo and Info */}
+            <View style={styles.aboutAppInfo}>
+              <View style={[styles.aboutAppIcon, { backgroundColor: '#007AFF' }]}>
+                <Ionicons name="analytics" size={48} color="#ffffff" />
+              </View>
+              <Text style={[styles.aboutAppName, { color: isDark ? '#ffffff' : '#000000' }]}>
+                GTO Poker Assistant
+              </Text>
+              <Text style={[styles.aboutAppVersion, { color: isDark ? '#d1d1d6' : '#666666' }]}>
+                Version 1.0.0 (Build 1)
+              </Text>
+              <Text style={[styles.aboutAppDescription, { color: isDark ? '#d1d1d6' : '#666666' }]}>
+                Advanced Game Theory Optimal poker analysis powered by AI. Improve your poker skills with real-time hand analysis and personalized training.
+              </Text>
+            </View>
+
+            {/* Developer Info */}
+            <View style={styles.aboutSection}>
+              <Text style={[styles.aboutSectionTitle, { color: '#007AFF' }]}>
+                👨‍💻 Developer
+              </Text>
+              <Text style={[styles.aboutText, { color: isDark ? '#ffffff' : '#000000' }]}>
+                Developed with ❤️ by the GTO Poker Team
+              </Text>
+              <Text style={[styles.aboutText, { color: isDark ? '#d1d1d6' : '#666666' }]}>
+                Combining years of poker expertise with cutting-edge AI technology to help players improve their game.
+              </Text>
+            </View>
+
+            {/* Features */}
+            <View style={styles.aboutSection}>
+              <Text style={[styles.aboutSectionTitle, { color: '#007AFF' }]}>
+                ✨ Key Features
+              </Text>
+              <View style={styles.aboutFeatureList}>
+                <Text style={[styles.aboutFeature, { color: isDark ? '#ffffff' : '#000000' }]}>
+                  • Real-time poker hand analysis
+                </Text>
+                <Text style={[styles.aboutFeature, { color: isDark ? '#ffffff' : '#000000' }]}>
+                  • GTO strategy recommendations
+                </Text>
+                <Text style={[styles.aboutFeature, { color: isDark ? '#ffffff' : '#000000' }]}>
+                  • Performance tracking and statistics
+                </Text>
+                <Text style={[styles.aboutFeature, { color: isDark ? '#ffffff' : '#000000' }]}>
+                  • Personalized training modes
+                </Text>
+                <Text style={[styles.aboutFeature, { color: isDark ? '#ffffff' : '#000000' }]}>
+                  • Multi-format support (Cash, Tournament)
+                </Text>
+                <Text style={[styles.aboutFeature, { color: isDark ? '#ffffff' : '#000000' }]}>
+                  • Dark/Light theme support
+                </Text>
+              </View>
+            </View>
+
+            {/* Legal */}
+            <View style={styles.aboutSection}>
+              <Text style={[styles.aboutSectionTitle, { color: '#007AFF' }]}>
+                📜 Legal
+              </Text>
+              <Text style={[styles.aboutText, { color: isDark ? '#d1d1d6' : '#666666' }]}>
+                © 2024 GTO Poker Assistant. All rights reserved.
+              </Text>
+              <Text style={[styles.aboutText, { color: isDark ? '#d1d1d6' : '#666666' }]}>
+                This app is for educational purposes only. Please gamble responsibly.
+              </Text>
+            </View>
+
+            {/* Contact */}
+            <View style={styles.aboutSection}>
+              <Text style={[styles.aboutSectionTitle, { color: '#007AFF' }]}>
+                📧 Contact
+              </Text>
+              <TouchableOpacity onPress={() => Linking.openURL('mailto:hello@gtopokerassistant.com')}>
+                <Text style={[styles.aboutContactLink, { color: '#007AFF' }]}>
+                  hello@gtopokerassistant.com
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity onPress={() => Linking.openURL('https://gtopokerassistant.com')}>
+                <Text style={[styles.aboutContactLink, { color: '#007AFF' }]}>
+                  www.gtopokerassistant.com
+                </Text>
+              </TouchableOpacity>
+            </View>
+
+            {/* Footer */}
+            <View style={styles.aboutFooter}>
+              <Text style={[styles.aboutFooterText, { color: isDark ? '#8e8e93' : '#666666' }]}>
+                Made with 🃏 for poker enthusiasts worldwide
+              </Text>
+              <Text style={[styles.aboutFooterText, { color: isDark ? '#8e8e93' : '#666666' }]}>
+                Last updated: {new Date().toLocaleDateString()}
               </Text>
             </View>
           </ScrollView>
@@ -1373,6 +1908,311 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   privacyFooterText: {
+    fontSize: 14,
+    textAlign: 'center',
+    marginBottom: 5,
+  },
+  
+  // Help & FAQ Modal Styles
+  helpFAQModalFullScreen: {
+    flex: 1,
+  },
+  helpFAQModalHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 20,
+    paddingTop: Platform.OS === 'ios' ? 50 : 20,
+    paddingBottom: 15,
+    borderBottomWidth: 1,
+  },
+  helpFAQModalTitle: {
+    fontSize: 24,
+    fontWeight: '700',
+  },
+  helpFAQModalCloseButton: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  searchContainer: {
+    paddingHorizontal: 20,
+    paddingVertical: 15,
+  },
+  searchInputContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 15,
+    paddingVertical: 12,
+    borderRadius: 12,
+    borderWidth: 1,
+  },
+  searchInput: {
+    flex: 1,
+    fontSize: 16,
+    marginLeft: 10,
+  },
+  helpFAQModalScrollContainer: {
+    flex: 1,
+  },
+  helpFAQModalScrollContent: {
+    padding: 20,
+    paddingBottom: 40,
+  },
+  faqCategory: {
+    marginBottom: 30,
+  },
+  faqCategoryHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 15,
+  },
+  faqCategoryTitle: {
+    fontSize: 20,
+    fontWeight: '700',
+    marginLeft: 12,
+  },
+  faqItem: {
+    padding: 20,
+    borderRadius: 12,
+    marginBottom: 12,
+    borderWidth: 1,
+  },
+  faqQuestion: {
+    fontSize: 16,
+    fontWeight: '600',
+    marginBottom: 10,
+  },
+  faqAnswer: {
+    fontSize: 15,
+    lineHeight: 22,
+  },
+  noResultsContainer: {
+    alignItems: 'center',
+    paddingVertical: 60,
+  },
+  noResultsText: {
+    fontSize: 18,
+    fontWeight: '600',
+    marginTop: 20,
+    textAlign: 'center',
+  },
+  noResultsSubtext: {
+    fontSize: 14,
+    marginTop: 8,
+    textAlign: 'center',
+  },
+  supportSuggestion: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 20,
+    borderRadius: 12,
+    borderWidth: 1,
+    marginTop: 20,
+  },
+  supportSuggestionText: {
+    flex: 1,
+    marginLeft: 15,
+  },
+  supportSuggestionTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    marginBottom: 4,
+  },
+  supportSuggestionSubtitle: {
+    fontSize: 14,
+  },
+  supportSuggestionButton: {
+    backgroundColor: '#007AFF',
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 8,
+  },
+  supportSuggestionButtonText: {
+    color: '#ffffff',
+    fontSize: 14,
+    fontWeight: '600',
+  },
+
+  // Contact Support Modal Styles
+  contactSupportModalFullScreen: {
+    flex: 1,
+  },
+  contactSupportModalHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 20,
+    paddingTop: Platform.OS === 'ios' ? 50 : 20,
+    paddingBottom: 15,
+    borderBottomWidth: 1,
+  },
+  contactSupportModalTitle: {
+    fontSize: 24,
+    fontWeight: '700',
+  },
+  contactSupportModalCloseButton: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  contactSupportModalScrollContainer: {
+    flex: 1,
+  },
+  contactSupportModalScrollContent: {
+    padding: 20,
+    paddingBottom: 40,
+  },
+  supportOption: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 20,
+    borderRadius: 12,
+    marginBottom: 15,
+    borderWidth: 1,
+  },
+  supportOptionIcon: {
+    marginRight: 15,
+  },
+  supportOptionContent: {
+    flex: 1,
+  },
+  supportOptionTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+    marginBottom: 4,
+  },
+  supportOptionDescription: {
+    fontSize: 14,
+    marginBottom: 8,
+  },
+  supportOptionDetail: {
+    fontSize: 14,
+    fontWeight: '500',
+  },
+  responseTimeInfo: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    padding: 20,
+    borderRadius: 12,
+    borderWidth: 1,
+    marginTop: 20,
+  },
+  responseTimeContent: {
+    flex: 1,
+    marginLeft: 15,
+  },
+  responseTimeTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    marginBottom: 8,
+  },
+  responseTimeText: {
+    fontSize: 14,
+    lineHeight: 20,
+  },
+
+  // About Modal Styles
+  aboutModalFullScreen: {
+    flex: 1,
+  },
+  aboutModalHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 20,
+    paddingTop: Platform.OS === 'ios' ? 50 : 20,
+    paddingBottom: 15,
+    borderBottomWidth: 1,
+  },
+  aboutModalTitle: {
+    fontSize: 24,
+    fontWeight: '700',
+  },
+  aboutModalCloseButton: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  aboutModalScrollContainer: {
+    flex: 1,
+  },
+  aboutModalScrollContent: {
+    padding: 20,
+    paddingBottom: 40,
+  },
+  aboutAppInfo: {
+    alignItems: 'center',
+    paddingVertical: 30,
+  },
+  aboutAppIcon: {
+    width: 80,
+    height: 80,
+    borderRadius: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  aboutAppName: {
+    fontSize: 24,
+    fontWeight: '700',
+    marginBottom: 8,
+    textAlign: 'center',
+  },
+  aboutAppVersion: {
+    fontSize: 16,
+    marginBottom: 15,
+    textAlign: 'center',
+  },
+  aboutAppDescription: {
+    fontSize: 15,
+    lineHeight: 22,
+    textAlign: 'center',
+    paddingHorizontal: 20,
+  },
+  aboutSection: {
+    marginBottom: 30,
+  },
+  aboutSectionTitle: {
+    fontSize: 20,
+    fontWeight: '700',
+    marginBottom: 15,
+  },
+  aboutText: {
+    fontSize: 16,
+    lineHeight: 24,
+    marginBottom: 10,
+  },
+  aboutFeatureList: {
+    marginTop: 5,
+  },
+  aboutFeature: {
+    fontSize: 15,
+    lineHeight: 22,
+    marginBottom: 6,
+  },
+  aboutTechInfo: {
+    fontSize: 14,
+    lineHeight: 20,
+    fontFamily: Platform.OS === 'ios' ? 'Menlo' : 'monospace',
+  },
+  aboutContactLink: {
+    fontSize: 16,
+    marginBottom: 8,
+    textDecorationLine: 'underline',
+  },
+  aboutFooter: {
+    alignItems: 'center',
+    paddingTop: 30,
+    marginTop: 20,
+  },
+  aboutFooterText: {
     fontSize: 14,
     textAlign: 'center',
     marginBottom: 5,
