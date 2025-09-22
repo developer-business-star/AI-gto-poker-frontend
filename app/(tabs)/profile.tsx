@@ -20,6 +20,7 @@ import { useUserStats } from '@/hooks/useUserStats';
 import { API_CONFIG } from '@/config/api';
 import * as FileSystem from 'expo-file-system';
 import * as Sharing from 'expo-sharing';
+import supportService from '@/services/supportService';
 import React, { useState, useEffect } from 'react';
 
 interface ComprehensiveStats {
@@ -68,6 +69,14 @@ export default function ProfileScreen() {
   const [contactSupportModalVisible, setContactSupportModalVisible] = React.useState(false);
   const [aboutModalVisible, setAboutModalVisible] = React.useState(false);
   const [faqSearchQuery, setFaqSearchQuery] = React.useState('');
+  const [supportTicketModalVisible, setSupportTicketModalVisible] = React.useState(false);
+  const [supportTicketData, setSupportTicketData] = React.useState({
+    type: 'general' as 'general' | 'feature_request',
+    priority: 'medium' as 'low' | 'medium' | 'high' | 'urgent',
+    subject: '',
+    description: ''
+  });
+  const [isSubmittingTicket, setIsSubmittingTicket] = React.useState(false);
   const router = useRouter();
   const { hapticEnabled, toggleHaptic, triggerHaptic } = useHaptic();
   const { selectedFormat, setSelectedFormat, formatDisplayName, selectedStackSize, setSelectedStackSize, stackSizeDisplayName, selectedAnalysisSpeed, setSelectedAnalysisSpeed, analysisSpeedDisplayName, selectedDifficultyLevel, setSelectedDifficultyLevel, difficultyLevelDisplayName, selectedSessionLength, setSelectedSessionLength, sessionLengthDisplayName, sessionDurationMinutes, selectedFocusAreas, setSelectedFocusAreas, focusAreasDisplayName } = useGame();
@@ -442,6 +451,65 @@ export default function ProfileScreen() {
   const handleAboutPress = () => {
     triggerHaptic('light');
     setAboutModalVisible(true);
+  };
+
+  const handleCreateSupportTicket = () => {
+    triggerHaptic('light');
+    setSupportTicketModalVisible(true);
+  };
+
+  const handleSubmitSupportTicket = async () => {
+    if (!supportTicketData.subject.trim() || !supportTicketData.description.trim()) {
+      Alert.alert('Error', 'Please fill in both subject and description.');
+      return;
+    }
+
+    setIsSubmittingTicket(true);
+    
+    try {
+      const result = await supportService.createTicket({
+        type: supportTicketData.type,
+        priority: supportTicketData.priority,
+        subject: supportTicketData.subject.trim(),
+        description: supportTicketData.description.trim(),
+        userEmail: user?.email || '',
+        userFullName: user?.fullName || '',
+        userId: user?.id ?? undefined
+      }, token || undefined);
+
+      if (result.success && result.ticket) {
+        Alert.alert(
+          '✅ Ticket Created',
+          `Your support ticket has been created successfully!\n\nTicket ID: ${result.ticket.ticketId}\n\nWe'll respond to your request as soon as possible.`,
+          [
+            {
+              text: 'OK',
+              onPress: () => {
+                setSupportTicketModalVisible(false);
+                setSupportTicketData({
+                  type: 'general',
+                  priority: 'medium',
+                  subject: '',
+                  description: ''
+                });
+              }
+            }
+          ]
+        );
+      } else {
+        console.error('Support ticket creation failed:', result);
+        Alert.alert(
+          'Error Creating Ticket', 
+          result.error || 'Failed to create support ticket. Please try again.',
+          [{ text: 'OK' }]
+        );
+      }
+    } catch (error) {
+      console.error('Support ticket submission error:', error);
+      Alert.alert('Error', 'Failed to create support ticket. Please try again.');
+    } finally {
+      setIsSubmittingTicket(false);
+    }
   };
 
   // FAQ Data
@@ -1312,85 +1380,31 @@ export default function ProfileScreen() {
             contentContainerStyle={styles.contactSupportModalScrollContent}
             showsVerticalScrollIndicator={true}
           >
-            {/* Email Support */}
+            {/* Create Support Ticket */}
             <TouchableOpacity 
-              style={[styles.supportOption, { backgroundColor: isDark ? '#1c1c1e' : '#f8f9fa', borderColor: isDark ? '#38383a' : '#e1e5e9' }]}
+              style={[styles.supportOption, { backgroundColor: isDark ? '#1c1c1e' : '#f8f9fa', borderColor: '#007AFF' }]}
               onPress={() => {
-                const subject = encodeURIComponent('GTO Poker Assistant Support Request');
-                const body = encodeURIComponent(`Hi Support Team,
-
-I need help with:
-
-Device: ${Platform.OS}
-App Version: 1.0.0
-User: ${user?.email || 'Unknown'}
-
-Description:
-[Please describe your issue here]
-
-Best regards`);
-                Linking.openURL(`mailto:support@gtopokerassistant.com?subject=${subject}&body=${body}`);
+                setContactSupportModalVisible(false);
+                setTimeout(() => setSupportTicketModalVisible(true), 300);
               }}
             >
               <View style={styles.supportOptionIcon}>
-                <Ionicons name="mail" size={32} color="#007AFF" />
+                <Ionicons name="create" size={32} color="#007AFF" />
               </View>
               <View style={styles.supportOptionContent}>
                 <Text style={[styles.supportOptionTitle, { color: isDark ? '#ffffff' : '#000000' }]}>
-                  Email Support
+                  Create Support Ticket
                 </Text>
                 <Text style={[styles.supportOptionDescription, { color: isDark ? '#d1d1d6' : '#666666' }]}>
-                  Get detailed help via email. We typically respond within 24 hours.
+                  Submit a support request through our ticketing system. Get tracked responses and updates.
                 </Text>
                 <Text style={[styles.supportOptionDetail, { color: '#007AFF' }]}>
-                  support@gtopokerassistant.com
+                  Recommended • Fast Response
                 </Text>
               </View>
               <Ionicons name="chevron-forward" size={20} color={isDark ? '#8e8e93' : '#666666'} />
             </TouchableOpacity>
 
-            {/* Feature Request */}
-            <TouchableOpacity 
-              style={[styles.supportOption, { backgroundColor: isDark ? '#1c1c1e' : '#f8f9fa', borderColor: isDark ? '#38383a' : '#e1e5e9' }]}
-              onPress={() => {
-                const subject = encodeURIComponent('Feature Request - GTO Poker Assistant');
-                const body = encodeURIComponent(`Feature Request
-
-User: ${user?.email || 'Unknown'}
-Date: ${new Date().toLocaleString()}
-
-Feature Description:
-
-
-Why would this be useful:
-
-
-Priority (Low/Medium/High):
-
-
-Additional details:
-
-
-`);
-                Linking.openURL(`mailto:features@gtopokerassistant.com?subject=${subject}&body=${body}`);
-              }}
-            >
-              <View style={styles.supportOptionIcon}>
-                <Ionicons name="bulb" size={32} color="#ffd93d" />
-              </View>
-              <View style={styles.supportOptionContent}>
-                <Text style={[styles.supportOptionTitle, { color: isDark ? '#ffffff' : '#000000' }]}>
-                  Request Feature
-                </Text>
-                <Text style={[styles.supportOptionDescription, { color: isDark ? '#d1d1d6' : '#666666' }]}>
-                  Have an idea? Share your feature requests with us.
-                </Text>
-                <Text style={[styles.supportOptionDetail, { color: '#ffd93d' }]}>
-                  features@gtopokerassistant.com
-                </Text>
-              </View>
-              <Ionicons name="chevron-forward" size={20} color={isDark ? '#8e8e93' : '#666666'} />
-            </TouchableOpacity>
 
             {/* Response Time Info */}
             <View style={[styles.responseTimeInfo, { backgroundColor: isDark ? '#1c1c1e' : '#f0f8ff', borderColor: isDark ? '#38383a' : '#007AFF' }]}>
@@ -1406,6 +1420,219 @@ Additional details:
                 </Text>
               </View>
             </View>
+          </ScrollView>
+        </View>
+      </Modal>
+
+      {/* Support Ticket Creation Modal */}
+      <Modal
+        visible={supportTicketModalVisible}
+        transparent={false}
+        animationType="slide"
+        onRequestClose={() => setSupportTicketModalVisible(false)}
+      >
+        <View style={[styles.supportTicketModalFullScreen, { backgroundColor: isDark ? '#000000' : '#ffffff' }]}>
+          {/* Header */}
+          <View style={[styles.supportTicketModalHeader, { 
+            backgroundColor: isDark ? '#1c1c1e' : '#f8f9fa',
+            borderBottomColor: isDark ? '#38383a' : '#e1e5e9' 
+          }]}>
+            <Text style={[styles.supportTicketModalTitle, { color: isDark ? '#ffffff' : '#000000' }]}>
+              Create Support Ticket
+            </Text>
+            <TouchableOpacity
+              style={[styles.supportTicketModalCloseButton, { backgroundColor: isDark ? '#2c2c2e' : '#e9ecef' }]}
+              onPress={() => setSupportTicketModalVisible(false)}
+              activeOpacity={0.7}
+            >
+              <Ionicons name="close" size={20} color={isDark ? '#ffffff' : '#000000'} />
+            </TouchableOpacity>
+          </View>
+          
+          {/* Content */}
+          <ScrollView 
+            style={styles.supportTicketModalScrollContainer}
+            contentContainerStyle={styles.supportTicketModalScrollContent}
+            showsVerticalScrollIndicator={true}
+          >
+            {/* Type Selection */}
+            <View style={styles.supportTicketSection}>
+              <Text style={[styles.supportTicketLabel, { color: isDark ? '#ffffff' : '#000000' }]}>
+                Request Type
+              </Text>
+              <View style={styles.supportTicketTypeContainer}>
+                <TouchableOpacity
+                  style={[
+                    styles.supportTicketTypeButton,
+                    { 
+                      backgroundColor: supportTicketData.type === 'general' ? '#007AFF' : (isDark ? '#2c2c2e' : '#f8f9fa'),
+                      borderColor: supportTicketData.type === 'general' ? '#007AFF' : (isDark ? '#38383a' : '#e1e5e9')
+                    }
+                  ]}
+                  onPress={() => setSupportTicketData(prev => ({ ...prev, type: 'general' }))}
+                >
+                  <Ionicons 
+                    name="help-circle" 
+                    size={20} 
+                    color={supportTicketData.type === 'general' ? '#ffffff' : '#007AFF'} 
+                  />
+                  <Text style={[
+                    styles.supportTicketTypeText,
+                    { color: supportTicketData.type === 'general' ? '#ffffff' : (isDark ? '#ffffff' : '#000000') }
+                  ]}>
+                    General Support
+                  </Text>
+                </TouchableOpacity>
+                
+                <TouchableOpacity
+                  style={[
+                    styles.supportTicketTypeButton,
+                    { 
+                      backgroundColor: supportTicketData.type === 'feature_request' ? '#007AFF' : (isDark ? '#2c2c2e' : '#f8f9fa'),
+                      borderColor: supportTicketData.type === 'feature_request' ? '#007AFF' : (isDark ? '#38383a' : '#e1e5e9')
+                    }
+                  ]}
+                  onPress={() => setSupportTicketData(prev => ({ ...prev, type: 'feature_request' }))}
+                >
+                  <Ionicons 
+                    name="bulb" 
+                    size={20} 
+                    color={supportTicketData.type === 'feature_request' ? '#ffffff' : '#ffd93d'} 
+                  />
+                  <Text style={[
+                    styles.supportTicketTypeText,
+                    { color: supportTicketData.type === 'feature_request' ? '#ffffff' : (isDark ? '#ffffff' : '#000000') }
+                  ]}>
+                    Feature Request
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+
+            {/* Priority Selection */}
+            <View style={styles.supportTicketSection}>
+              <Text style={[styles.supportTicketLabel, { color: isDark ? '#ffffff' : '#000000' }]}>
+                Priority
+              </Text>
+              <View style={styles.supportTicketPriorityContainer}>
+                {['low', 'medium', 'high', 'urgent'].map((priority) => (
+                  <TouchableOpacity
+                    key={priority}
+                    style={[
+                      styles.supportTicketPriorityButton,
+                      { 
+                        backgroundColor: supportTicketData.priority === priority ? '#007AFF' : (isDark ? '#2c2c2e' : '#f8f9fa'),
+                        borderColor: supportTicketData.priority === priority ? '#007AFF' : (isDark ? '#38383a' : '#e1e5e9')
+                      }
+                    ]}
+                    onPress={() => setSupportTicketData(prev => ({ ...prev, priority: priority as any }))}
+                  >
+                    <Text style={[
+                      styles.supportTicketPriorityText,
+                      { color: supportTicketData.priority === priority ? '#ffffff' : (isDark ? '#ffffff' : '#000000') }
+                    ]}>
+                      {priority.charAt(0).toUpperCase() + priority.slice(1)}
+                    </Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+            </View>
+
+            {/* Subject Input */}
+            <View style={styles.supportTicketSection}>
+              <Text style={[styles.supportTicketLabel, { color: isDark ? '#ffffff' : '#000000' }]}>
+                Subject *
+              </Text>
+              <TextInput
+                style={[
+                  styles.supportTicketInput,
+                  { 
+                    backgroundColor: isDark ? '#2c2c2e' : '#ffffff',
+                    borderColor: isDark ? '#38383a' : '#e1e5e9',
+                    color: isDark ? '#ffffff' : '#000000'
+                  }
+                ]}
+                placeholder="Brief description of your issue or request"
+                placeholderTextColor={isDark ? '#8e8e93' : '#666666'}
+                value={supportTicketData.subject}
+                onChangeText={(text) => setSupportTicketData(prev => ({ ...prev, subject: text }))}
+                maxLength={200}
+              />
+              <Text style={[styles.supportTicketCharCount, { color: isDark ? '#8e8e93' : '#666666' }]}>
+                {supportTicketData.subject.length}/200
+              </Text>
+            </View>
+
+            {/* Description Input */}
+            <View style={styles.supportTicketSection}>
+              <Text style={[styles.supportTicketLabel, { color: isDark ? '#ffffff' : '#000000' }]}>
+                Description *
+              </Text>
+              <TextInput
+                style={[
+                  styles.supportTicketTextArea,
+                  { 
+                    backgroundColor: isDark ? '#2c2c2e' : '#ffffff',
+                    borderColor: isDark ? '#38383a' : '#e1e5e9',
+                    color: isDark ? '#ffffff' : '#000000'
+                  }
+                ]}
+                placeholder="Please provide detailed information about your issue or feature request..."
+                placeholderTextColor={isDark ? '#8e8e93' : '#666666'}
+                value={supportTicketData.description}
+                onChangeText={(text) => setSupportTicketData(prev => ({ ...prev, description: text }))}
+                multiline
+                numberOfLines={6}
+                textAlignVertical="top"
+                maxLength={5000}
+              />
+              <Text style={[styles.supportTicketCharCount, { color: isDark ? '#8e8e93' : '#666666' }]}>
+                {supportTicketData.description.length}/5000
+              </Text>
+            </View>
+
+            {/* User Info Display */}
+            <View style={[styles.supportTicketInfoCard, { backgroundColor: isDark ? '#1c1c1e' : '#f8f9fa', borderColor: isDark ? '#38383a' : '#e1e5e9' }]}>
+              <Text style={[styles.supportTicketInfoTitle, { color: isDark ? '#ffffff' : '#000000' }]}>
+                Contact Information
+              </Text>
+              <Text style={[styles.supportTicketInfoText, { color: isDark ? '#d1d1d6' : '#666666' }]}>
+                Email: {user?.email || 'Not available'}
+              </Text>
+              <Text style={[styles.supportTicketInfoText, { color: isDark ? '#d1d1d6' : '#666666' }]}>
+                Name: {user?.fullName || 'Not available'}
+              </Text>
+              <Text style={[styles.supportTicketInfoText, { color: isDark ? '#d1d1d6' : '#666666' }]}>
+                Platform: {Platform.OS}
+              </Text>
+            </View>
+
+            {/* Submit Button */}
+            <TouchableOpacity
+              style={[
+                styles.supportTicketSubmitButton,
+                { 
+                  backgroundColor: (!supportTicketData.subject.trim() || !supportTicketData.description.trim() || isSubmittingTicket) 
+                    ? (isDark ? '#2c2c2e' : '#e9ecef') 
+                    : '#007AFF',
+                  opacity: (!supportTicketData.subject.trim() || !supportTicketData.description.trim() || isSubmittingTicket) ? 0.6 : 1
+                }
+              ]}
+              onPress={handleSubmitSupportTicket}
+              disabled={!supportTicketData.subject.trim() || !supportTicketData.description.trim() || isSubmittingTicket}
+            >
+              {isSubmittingTicket ? (
+                <>
+                  <ActivityIndicator size="small" color="#ffffff" />
+                  <Text style={styles.supportTicketSubmitButtonText}>Creating Ticket...</Text>
+                </>
+              ) : (
+                <>
+                  <Ionicons name="send" size={20} color="#ffffff" />
+                  <Text style={styles.supportTicketSubmitButtonText}>Create Support Ticket</Text>
+                </>
+              )}
+            </TouchableOpacity>
           </ScrollView>
         </View>
       </Modal>
@@ -2169,5 +2396,124 @@ const styles = StyleSheet.create({
     fontSize: 14,
     textAlign: 'center',
     marginBottom: 5,
+  },
+
+  // Support Ticket Modal Styles
+  supportTicketModalFullScreen: {
+    flex: 1,
+  },
+  supportTicketModalHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 20,
+    paddingTop: Platform.OS === 'ios' ? 50 : 20,
+    paddingBottom: 15,
+    borderBottomWidth: 1,
+  },
+  supportTicketModalTitle: {
+    fontSize: 24,
+    fontWeight: '700',
+  },
+  supportTicketModalCloseButton: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  supportTicketModalScrollContainer: {
+    flex: 1,
+  },
+  supportTicketModalScrollContent: {
+    padding: 20,
+    paddingBottom: 40,
+  },
+  supportTicketSection: {
+    marginBottom: 25,
+  },
+  supportTicketLabel: {
+    fontSize: 16,
+    fontWeight: '600',
+    marginBottom: 12,
+  },
+  supportTicketTypeContainer: {
+    flexDirection: 'row',
+    gap: 12,
+  },
+  supportTicketTypeButton: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 15,
+    borderRadius: 12,
+    borderWidth: 1,
+    gap: 8,
+  },
+  supportTicketTypeText: {
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  supportTicketPriorityContainer: {
+    flexDirection: 'row',
+    gap: 8,
+  },
+  supportTicketPriorityButton: {
+    flex: 1,
+    padding: 12,
+    borderRadius: 8,
+    borderWidth: 1,
+    alignItems: 'center',
+  },
+  supportTicketPriorityText: {
+    fontSize: 12,
+    fontWeight: '600',
+  },
+  supportTicketInput: {
+    padding: 15,
+    borderRadius: 12,
+    borderWidth: 1,
+    fontSize: 16,
+  },
+  supportTicketTextArea: {
+    padding: 15,
+    borderRadius: 12,
+    borderWidth: 1,
+    fontSize: 16,
+    minHeight: 120,
+  },
+  supportTicketCharCount: {
+    fontSize: 12,
+    textAlign: 'right',
+    marginTop: 5,
+  },
+  supportTicketInfoCard: {
+    padding: 15,
+    borderRadius: 12,
+    borderWidth: 1,
+    marginBottom: 20,
+  },
+  supportTicketInfoTitle: {
+    fontSize: 14,
+    fontWeight: '600',
+    marginBottom: 8,
+  },
+  supportTicketInfoText: {
+    fontSize: 13,
+    marginBottom: 4,
+  },
+  supportTicketSubmitButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 16,
+    borderRadius: 12,
+    gap: 8,
+  },
+  supportTicketSubmitButtonText: {
+    color: '#ffffff',
+    fontSize: 16,
+    fontWeight: '600',
   },
 }); 
