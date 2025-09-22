@@ -480,7 +480,7 @@ export default function ProfileScreen() {
       if (result.success && result.ticket) {
         Alert.alert(
           '✅ Ticket Created',
-          `Your support ticket has been created successfully!\n\nTicket ID: ${result.ticket.ticketId}\n\nWe'll respond to your request as soon as possible.`,
+          `Your support ticket has been created successfully!\n\nWe'll respond to your request as soon as possible.`,
           [
             {
               text: 'OK',
