@@ -33,8 +33,9 @@ export const DEV_CONFIG = {
 // API Configuration
 export const API_CONFIG = {
   // Backend server URL
-  BASE_URL: getBaseUrl(),
+  // BASE_URL: getBaseUrl(),
   // BASE_URL: `https://bb4c4ad182c9.ngrok-free.app/api`,
+  BASE_URL: `https://ai-gto-poker-backend.onrender.com/api`,
 
   // Request timeouts
   TIMEOUT: 30000, // 30 seconds
@@ -62,8 +63,9 @@ export const API_CONFIG = {
   DEBUG: {
     PLATFORM: Platform.OS,
     IS_DEV: __DEV__,
-    RESOLVED_URL: getBaseUrl(),
+    // RESOLVED_URL: getBaseUrl(),
     // RESOLVED_URL: `https://bb4c4ad182c9.ngrok-free.app/api`,
+    BASE_URL: `https://ai-gto-poker-backend.onrender.com/api`,
   }
 };
 

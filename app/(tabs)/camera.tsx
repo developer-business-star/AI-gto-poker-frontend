@@ -269,11 +269,6 @@ export default function CameraScreen() {
       const totalAnalysisTime = analysisEndTime - analysisStartTime;
       const totalAnalysisTimeSeconds = (totalAnalysisTime / 1000).toFixed(2);
 
-      console.log(`⏱️ Total analysis time: ${totalAnalysisTimeSeconds} seconds`);
-      if (uploadResponse.processingTime) {
-        console.log(`⚡ Backend processing time: ${uploadResponse.processingTime} seconds`);
-      }
-
       // Refresh analysis statistics after successful analysis
       await fetchAnalysisStats();
 
@@ -925,7 +920,7 @@ export default function CameraScreen() {
         <View style={styles.modalOverlay}>
           <Animated.View style={styles.modalContainer}>
             <View style={styles.modalHeader}>
-              <Text style={styles.modalTitle}>{analysisResult?.title}</Text>
+              <Text style={styles.modalTitle}>📡 {analysisResult?.title}</Text>
               <TouchableOpacity
                 style={styles.modalCloseButton}
                 onPress={() => setShowAnalysisModal(false)}
@@ -935,20 +930,7 @@ export default function CameraScreen() {
             </View>
 
             <View style={styles.modalContent}>
-              <Text style={styles.modalMessage}>{analysisResult?.message}</Text>
-              
-              <View style={styles.modalMetrics}>
-                <View style={styles.metricItem}>
-                  <Ionicons name="time" size={16} color="#007AFF" />
-                  <Text style={styles.metricText}>Total time: {analysisResult?.totalTime}s</Text>
-                </View>
-                {analysisResult?.processingTime && (
-                  <View style={styles.metricItem}>
-                    <Ionicons name="flash" size={16} color="#FF9500" />
-                    <Text style={styles.metricText}>Processing: {analysisResult.processingTime}s</Text>
-                  </View>
-                )}
-              </View>
+              <Text style={styles.modalMessage}>🎯 {analysisResult?.message}</Text>
             </View>
 
             <View style={styles.modalButtons}>
