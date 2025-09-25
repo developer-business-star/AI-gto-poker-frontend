@@ -216,7 +216,7 @@ export default function CameraScreen() {
       // Start loading modal
       setIsAnalyzing(true);
       setAnalysisProgress(0);
-      setAnalysisStage('Initializing analysis...');
+      setAnalysisStage('Image analysis...');
 
       // Start timing the analysis
       const analysisStartTime = Date.now();
@@ -238,12 +238,6 @@ export default function CameraScreen() {
           return prev;
         });
       }, 500);
-
-      // Update analysis stages
-      setTimeout(() => setAnalysisStage('Processing image...'), 1000);
-      setTimeout(() => setAnalysisStage('Analyzing table layout...'), 2000);
-      setTimeout(() => setAnalysisStage('Calculating GTO decisions...'), 4000);
-      setTimeout(() => setAnalysisStage('Finalizing analysis...'), 6000);
 
       // Step 1: Upload image to backend with user information
       const uploadResponse = await ApiService.uploadImageForAnalysis(imageUri, gameFormat, user || undefined);
@@ -268,6 +262,8 @@ export default function CameraScreen() {
       const analysisEndTime = Date.now();
       const totalAnalysisTime = analysisEndTime - analysisStartTime;
       const totalAnalysisTimeSeconds = (totalAnalysisTime / 1000).toFixed(2);
+
+      console.log('✅ Total analysis time:', totalAnalysisTimeSeconds);
 
       // Refresh analysis statistics after successful analysis
       await fetchAnalysisStats();
