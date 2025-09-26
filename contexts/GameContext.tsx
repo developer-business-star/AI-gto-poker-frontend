@@ -1,4 +1,7 @@
-import React, { createContext, useContext, useState } from 'react';
+import React, { createContext, useContext, useState, useEffect } from 'react';
+import { useAuth } from './AuthContext';
+import ApiService, { UserPreferences } from '@/services/apiService';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export type GameFormat = 'cash' | 'tournaments';
 export type StackSize = '50bb' | '100bb' | '200bb' | '300bb+';
@@ -32,12 +35,14 @@ interface GameContextType {
 const GameContext = createContext<GameContextType | undefined>(undefined);
 
 export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const { user, token } = useAuth();
   const [selectedFormat, setSelectedFormat] = useState<GameFormat>('cash');
   const [selectedStackSize, setSelectedStackSize] = useState<StackSize>('100bb');
   const [selectedAnalysisSpeed, setSelectedAnalysisSpeed] = useState<AnalysisSpeed>('fast');
   const [selectedDifficultyLevel, setSelectedDifficultyLevel] = useState<DifficultyLevel>('advanced');
   const [selectedSessionLength, setSelectedSessionLength] = useState<SessionLength>('30min');
   const [selectedFocusAreas, setSelectedFocusAreas] = useState<FocusArea[]>(['preflop', 'turn']);
+  const [isLoadingPreferences, setIsLoadingPreferences] = useState(false);
 
   const formatDisplayName = selectedFormat === 'cash' ? 'Cash Games' : 'Spin & Go';
   const stackSizeDisplayName = selectedStackSize;
@@ -68,26 +73,105 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
         ? selectedFocusAreas.map(area => area.charAt(0).toUpperCase() + area.slice(1).replace('_', ' ')).join(', ')
         : `${selectedFocusAreas.length} areas`;
 
+  // Load preferences from backend when user is available
+  useEffect(() => {
+    if (user?.id && token) {
+      loadUserPreferences();
+    }
+  }, [user?.id, token]);
+
+  // Load user preferences from backend
+  const loadUserPreferences = async () => {
+    if (!user?.id || !token) return;
+    
+    try {
+      setIsLoadingPreferences(true);
+      console.log('🔄 Loading user preferences from backend...');
+      
+      // For now, we'll load from the user object if it has preferences
+      // In the future, we can add a dedicated endpoint to fetch preferences
+      if (user.preferences) {
+        const prefs = user.preferences as any;
+        if (prefs.gameFormat) setSelectedFormat(prefs.gameFormat);
+        if (prefs.stackSize) setSelectedStackSize(prefs.stackSize);
+        if (prefs.analysisSpeed) setSelectedAnalysisSpeed(prefs.analysisSpeed);
+        if (prefs.difficultyLevel) setSelectedDifficultyLevel(prefs.difficultyLevel);
+        if (prefs.sessionLength) setSelectedSessionLength(prefs.sessionLength);
+        if (prefs.focusAreas) setSelectedFocusAreas(prefs.focusAreas);
+        console.log('✅ User preferences loaded from backend');
+      }
+    } catch (error) {
+      console.error('❌ Error loading user preferences:', error);
+    } finally {
+      setIsLoadingPreferences(false);
+    }
+  };
+
+  // Save preferences to backend
+  const savePreferencesToBackend = async (preferences: Partial<UserPreferences>) => {
+    if (!user?.id || !token) return;
+    
+    try {
+      console.log('💾 Saving preferences to backend:', preferences);
+      await ApiService.updateUserPreferences(user.id, preferences, token);
+      console.log('✅ Preferences saved to backend');
+    } catch (error) {
+      console.error('❌ Error saving preferences to backend:', error);
+      // Don't throw error to avoid breaking the UI
+    }
+  };
+
+  // Enhanced setters that save to backend
+  const setSelectedFormatWithSave = (format: GameFormat) => {
+    setSelectedFormat(format);
+    savePreferencesToBackend({ gameFormat: format });
+  };
+
+  const setSelectedStackSizeWithSave = (stackSize: StackSize) => {
+    setSelectedStackSize(stackSize);
+    savePreferencesToBackend({ stackSize });
+  };
+
+  const setSelectedAnalysisSpeedWithSave = (analysisSpeed: AnalysisSpeed) => {
+    setSelectedAnalysisSpeed(analysisSpeed);
+    savePreferencesToBackend({ analysisSpeed });
+  };
+
+  const setSelectedDifficultyLevelWithSave = (difficultyLevel: DifficultyLevel) => {
+    setSelectedDifficultyLevel(difficultyLevel);
+    savePreferencesToBackend({ difficultyLevel });
+  };
+
+  const setSelectedSessionLengthWithSave = (sessionLength: SessionLength) => {
+    setSelectedSessionLength(sessionLength);
+    savePreferencesToBackend({ sessionLength });
+  };
+
+  const setSelectedFocusAreasWithSave = (focusAreas: FocusArea[]) => {
+    setSelectedFocusAreas(focusAreas);
+    savePreferencesToBackend({ focusAreas });
+  };
+
   return (
     <GameContext.Provider value={{
       selectedFormat,
-      setSelectedFormat,
+      setSelectedFormat: setSelectedFormatWithSave,
       formatDisplayName,
       selectedStackSize,
-      setSelectedStackSize,
+      setSelectedStackSize: setSelectedStackSizeWithSave,
       stackSizeDisplayName,
       selectedAnalysisSpeed,
-      setSelectedAnalysisSpeed,
+      setSelectedAnalysisSpeed: setSelectedAnalysisSpeedWithSave,
       analysisSpeedDisplayName,
       selectedDifficultyLevel,
-      setSelectedDifficultyLevel,
+      setSelectedDifficultyLevel: setSelectedDifficultyLevelWithSave,
       difficultyLevelDisplayName,
       selectedSessionLength,
-      setSelectedSessionLength,
+      setSelectedSessionLength: setSelectedSessionLengthWithSave,
       sessionLengthDisplayName,
       sessionDurationMinutes,
       selectedFocusAreas,
-      setSelectedFocusAreas,
+      setSelectedFocusAreas: setSelectedFocusAreasWithSave,
       focusAreasDisplayName
     }}>
       {children}

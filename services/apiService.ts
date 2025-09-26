@@ -49,6 +49,7 @@ export interface User {
     icon: string;
     color: string;
   };
+  preferences?: UserPreferences;
   createdAt: string;
   updatedAt: string;
 }
@@ -78,6 +79,15 @@ export interface RegisterData {
 export interface LoginData {
   email: string;
   password: string;
+}
+
+export interface UserPreferences {
+  gameFormat?: 'cash' | 'tournaments';
+  stackSize?: '50bb' | '100bb' | '200bb' | '300bb+';
+  analysisSpeed?: 'slow' | 'fast' | 'instant' | 'adaptive';
+  difficultyLevel?: 'beginner' | 'intermediate' | 'advanced' | 'expert';
+  sessionLength?: '15min' | '30min' | '45min' | '60min' | 'custom';
+  focusAreas?: ('preflop' | 'flop' | 'turn' | 'river' | 'bluffing' | 'value_betting' | 'position' | 'stack_sizes')[];
 }
 
 class ApiService {
@@ -734,6 +744,69 @@ class ApiService {
       }
       
       throw new Error('Failed to retrieve user sessions');
+    }
+  }
+
+  /**
+   * Update user preferences
+   */
+  async updateUserPreferences(userId: string, preferences: UserPreferences, token?: string): Promise<{
+    success: boolean;
+    data?: {
+      user: User;
+      preferences: UserPreferences;
+    };
+    message?: string;
+    error?: string;
+  }> {
+    try {
+      console.log('🔄 Updating user preferences:', { userId, preferences });
+
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), API_CONFIG.TIMEOUT);
+
+      const headers: HeadersInit = {
+        'Content-Type': 'application/json',
+      };
+
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      }
+
+      const response = await fetch(`${this.baseUrl}/users/${userId}/preferences`, {
+        method: 'PUT',
+        headers,
+        body: JSON.stringify(preferences),
+        signal: controller.signal,
+      });
+
+      clearTimeout(timeoutId);
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.error || `Failed to update preferences: ${response.status}`);
+      }
+
+      console.log('✅ User preferences updated successfully');
+      return result;
+
+    } catch (error) {
+      console.error('❌ Error updating user preferences:', error);
+      
+      if (error instanceof Error) {
+        if (error.name === 'AbortError') {
+          throw new Error('Request timeout - Please check your connection');
+        }
+        
+        if (error.message.includes('Network request failed')) {
+          throw new Error('Network connection failed - Please check if backend server is running');
+        }
+        
+        throw new Error(error.message);
+      }
+      
+      throw new Error('Failed to update user preferences. Please try again.');
     }
   }
 
