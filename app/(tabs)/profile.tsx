@@ -639,29 +639,29 @@ export default function ProfileScreen() {
         },
       ]
     },
-    {
-      title: t('profile.trainingSettings'),
-      items: [
-        { 
-          label: t('profile.settings.difficultyLevel'), 
-          value: difficultyLevelDisplayName, 
-          icon: 'library', 
-          onPress: handleDifficultyLevelPress 
-        },
-        { 
-          label: t('profile.settings.sessionLength'), 
-          value: sessionLengthDisplayName, 
-          icon: 'time', 
-          onPress: handleSessionLengthPress 
-        },
-        { 
-          label: t('profile.settings.focusAreas'), 
-          value: focusAreasDisplayName, 
-          icon: 'bulb', 
-          onPress: handleFocusAreasPress 
-        },
-      ]
-    },
+    // {
+    //   title: t('profile.trainingSettings'),
+    //   items: [
+    //     { 
+    //       label: t('profile.settings.difficultyLevel'), 
+    //       value: difficultyLevelDisplayName, 
+    //       icon: 'library', 
+    //       onPress: handleDifficultyLevelPress 
+    //     },
+    //     { 
+    //       label: t('profile.settings.sessionLength'), 
+    //       value: sessionLengthDisplayName, 
+    //       icon: 'time', 
+    //       onPress: handleSessionLengthPress 
+    //     },
+    //     { 
+    //       label: t('profile.settings.focusAreas'), 
+    //       value: focusAreasDisplayName, 
+    //       icon: 'bulb', 
+    //       onPress: handleFocusAreasPress 
+    //     },
+    //   ]
+    // },
     {
       title: t('profile.dataPrivacy'),
       items: [

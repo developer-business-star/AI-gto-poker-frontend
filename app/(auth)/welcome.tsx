@@ -1,4 +1,4 @@
-import { ThemedView } from '@/components/ThemedView';
+// import { ThemedView } from '@/components/ThemedView';
 import { Ionicons, MaterialIcons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import React from 'react';
@@ -18,7 +18,7 @@ export default function WelcomeScreen() {
       resizeMode="cover"
     >
       <View style={styles.overlay}>
-        <ThemedView style={styles.container}>
+        <View style={styles.container}>
           {/* Hero Section */}
           <View style={styles.heroSection}>
             <View style={styles.iconContainer}>
@@ -85,7 +85,7 @@ export default function WelcomeScreen() {
           <View style={styles.footer}>
             <Text style={styles.footerText}>{t('welcome.footer')}</Text>
           </View>
-        </ThemedView>
+        </View>
       </View>
     </ImageBackground>
   );
