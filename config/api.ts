@@ -34,7 +34,7 @@ export const DEV_CONFIG = {
 export const API_CONFIG = {
   // Backend server URL
   // BASE_URL: getBaseUrl(),
-  // BASE_URL: `https://02e479f4d604.ngrok-free.app/api`,
+  // BASE_URL: `https://a2fa80910b9f.ngrok-free.app/api`,
   BASE_URL: `https://a6s23vup6g.eu-central-1.awsapprunner.com/api`,
 
   // Request timeouts
@@ -64,7 +64,7 @@ export const API_CONFIG = {
     PLATFORM: Platform.OS,
     IS_DEV: __DEV__,
     // RESOLVED_URL: getBaseUrl(),
-    // RESOLVED_URL: `https://02e479f4d604.ngrok-free.app/api`,
+    // RESOLVED_URL: `https://a2fa80910b9f.ngrok-free.app/api`,
     RESOLVED_URL: `https://a6s23vup6g.eu-central-1.awsapprunner.com/api`,
   }
 };
