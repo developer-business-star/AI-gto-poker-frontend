@@ -1,21 +1,14 @@
 import { Platform } from 'react-native';
 
-// Get the correct base URL for different environments
 const getBaseUrl = () => {
-  if (__DEV__) {
-    // Development environment
-    // For Expo Go on real devices, we need to use the computer's IP address
-    // Make sure your computer and phone are on the same WiFi network
-    
-    // Try multiple IP addresses for better compatibility
+  if (__DEV__) {    
+
     const possibleIPs = [
-      '192.168.145.28', // Your current IP
-      '192.168.1.100',  // Common home network IP
-      '10.0.0.100',     // Alternative network IP
+      '172.20.1.182',
+      '10.0.0.100',
     ];
     
-    // Use the first IP for now, but you can change this based on your network
-    const currentIP = '192.168.145.28';
+    const currentIP = '172.20.1.182';
     
     return `http://${currentIP}:3001/api`;
   } else {
@@ -24,18 +17,17 @@ const getBaseUrl = () => {
   }
 };
 
-// Development Configuration
 export const DEV_CONFIG = {
-  USE_MOCK_FORMAT_STATS: false, // Set to false when backend endpoints are ready - NOW USING REAL DATA!
-  SHOW_MOCK_DATA_LOGS: true,   // Set to false to hide mock data logs
+  USE_MOCK_FORMAT_STATS: false,
+  SHOW_MOCK_DATA_LOGS: true,
 };
 
 // API Configuration
 export const API_CONFIG = {
   // Backend server URL
   // BASE_URL: getBaseUrl(),
-  // BASE_URL: `https://a2fa80910b9f.ngrok-free.app/api`,
-  BASE_URL: `https://a6s23vup6g.eu-central-1.awsapprunner.com/api`,
+  BASE_URL: `https://a0d5b792ea6f.ngrok-free.app/api`,
+  // BASE_URL: `https://a6s23vup6g.eu-central-1.awsapprunner.com/api`,
 
   // Request timeouts
   TIMEOUT: 30000, // 30 seconds
@@ -48,9 +40,30 @@ export const API_CONFIG = {
 
   // Image upload settings
   IMAGE: {
-    MAX_SIZE_MB: 10,
+    MAX_SIZE_MB: 5,
     QUALITY: 0.8,
     ASPECT_RATIO: [16, 9] as [number, number],
+
+    RESIZE: {
+      MAX_WIDTH: 1920,
+      MAX_HEIGHT: 1080,
+      MIN_WIDTH: 640,
+      MIN_HEIGHT: 360,
+    },
+    
+    COMPRESSION: {
+      LARGE_FILE_THRESHOLD: 2 * 1024 * 1024, 
+      MEDIUM_FILE_THRESHOLD: 1 * 1024 * 1024,
+      LARGE_FILE_QUALITY: 0.6,
+      MEDIUM_FILE_QUALITY: 0.7,
+      SMALL_FILE_QUALITY: 0.8,
+    },
+    
+    // Format settings
+    FORMAT: {
+      OUTPUT_FORMAT: 'jpeg',
+      REMOVE_EXIF: true,
+    }
   },
 
   // Format mappings
@@ -64,8 +77,8 @@ export const API_CONFIG = {
     PLATFORM: Platform.OS,
     IS_DEV: __DEV__,
     // RESOLVED_URL: getBaseUrl(),
-    // RESOLVED_URL: `https://a2fa80910b9f.ngrok-free.app/api`,
-    RESOLVED_URL: `https://a6s23vup6g.eu-central-1.awsapprunner.com/api`,
+    RESOLVED_URL: `https://a0d5b792ea6f.ngrok-free.app/api`,
+    // RESOLVED_URL: `https://a6s23vup6g.eu-central-1.awsapprunner.com/api`,
   }
 };
 

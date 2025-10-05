@@ -263,7 +263,7 @@ export default function CameraScreen() {
       const totalAnalysisTime = analysisEndTime - analysisStartTime;
       const totalAnalysisTimeSeconds = (totalAnalysisTime / 1000).toFixed(2);
 
-      console.log('✅ Total analysis time:', totalAnalysisTimeSeconds);
+      // console.log('✅ Total analysis time:', totalAnalysisTimeSeconds);
 
       // Refresh analysis statistics after successful analysis
       await fetchAnalysisStats();
