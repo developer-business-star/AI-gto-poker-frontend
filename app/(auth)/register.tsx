@@ -1,5 +1,5 @@
 import { Alert } from '@/components/StyledAlert';
-// import { ThemedView } from '@/components/ThemedView';
+import { ThemedView } from '@/components/ThemedView';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
@@ -149,7 +149,7 @@ export default function RegisterScreen() {
   };
 
   return (
-    <View style={styles.container}>
+    <ThemedView style={styles.container}>
       <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
         {/* Header */}
         <View style={styles.header}>
@@ -377,7 +377,7 @@ export default function RegisterScreen() {
           </View>
         </Modal>
       </ScrollView>
-    </View>
+    </ThemedView>
   );
 }
 

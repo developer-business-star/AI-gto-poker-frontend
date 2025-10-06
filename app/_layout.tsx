@@ -4,6 +4,7 @@ import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect } from 'react';
+import 'react-native-reanimated';
 
 import { StyledAlertProvider } from '@/components/StyledAlert';
 import { GameProvider } from '@/contexts/GameContext';
