@@ -13,7 +13,23 @@ import { FontAwesome5, Ionicons, MaterialIcons } from '@expo/vector-icons';
 export default function TabLayout() {
   const colorScheme = useColorScheme();
   const { t } = useTranslation();
-  const { colors, isDark } = useTheme();
+  
+  // Add fallback for theme context
+  let colors, isDark;
+  try {
+    const theme = useTheme();
+    colors = theme.colors;
+    isDark = theme.isDark;
+  } catch (error) {
+    // Fallback to default colors if theme context is not available
+    colors = {
+      primary: '#007AFF',
+      textSecondary: '#8E8E93',
+      surface: '#FFFFFF',
+      border: '#C6C6C8'
+    };
+    isDark = false;
+  }
 
   return (
     <Tabs

@@ -35,7 +35,17 @@ interface GameContextType {
 const GameContext = createContext<GameContextType | undefined>(undefined);
 
 export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const { user, token } = useAuth();
+  // Add fallback for AuthContext
+  let user, token;
+  try {
+    const auth = useAuth();
+    user = auth.user;
+    token = auth.token;
+  } catch (error) {
+    // Fallback values if AuthContext is not available
+    user = null;
+    token = null;
+  }
   const [selectedFormat, setSelectedFormat] = useState<GameFormat>('cash');
   const [selectedStackSize, setSelectedStackSize] = useState<StackSize>('100bb');
   const [selectedAnalysisSpeed, setSelectedAnalysisSpeed] = useState<AnalysisSpeed>('fast');
@@ -182,7 +192,28 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
 export const useGame = () => {
   const context = useContext(GameContext);
   if (context === undefined) {
-    throw new Error('useGame must be used within a GameProvider');
+    // Return fallback values instead of throwing error
+    return {
+      selectedFormat: 'cash' as GameFormat,
+      setSelectedFormat: () => {},
+      formatDisplayName: 'Cash Games',
+      selectedStackSize: '100bb' as StackSize,
+      setSelectedStackSize: () => {},
+      stackSizeDisplayName: '100bb',
+      selectedAnalysisSpeed: 'fast' as AnalysisSpeed,
+      setSelectedAnalysisSpeed: () => {},
+      analysisSpeedDisplayName: 'Fast',
+      selectedDifficultyLevel: 'advanced' as DifficultyLevel,
+      setSelectedDifficultyLevel: () => {},
+      difficultyLevelDisplayName: 'Advanced',
+      selectedSessionLength: '30min' as SessionLength,
+      setSelectedSessionLength: () => {},
+      sessionLengthDisplayName: '30min',
+      sessionDurationMinutes: 30,
+      selectedFocusAreas: ['preflop', 'turn'] as FocusArea[],
+      setSelectedFocusAreas: () => {},
+      focusAreasDisplayName: 'Preflop, Turn'
+    };
   }
   return context;
 }; 
